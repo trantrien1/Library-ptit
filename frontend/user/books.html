@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách sách - Thư viện PTIT</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Thư viện PTIT</h2>
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="dashboard.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></span> <span>Dashboard</span></a></li>
+                <li><a href="books.html" class="active"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></span> <span>Danh sách sách</span></a></li>
+                <li><a href="wishlist.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></span> <span>Giỏ mượn</span> <span class="badge badge-primary" id="wishlist-badge" style="display:none;"></span></a></li>
+                <li><a href="borrows.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> <span>Phiếu mượn của tôi</span></a></li>
+                <li><a href="chatbot.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span> <span>Chatbot AI</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-account-box">
+                    <div class="user-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-user-name">Đang tải...</div>
+                        <div class="user-role">Độc giả</div>
+                    </div>
+                    <button class="btn-logout" onclick="logout()" title="Đăng xuất">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header d-flex justify-between align-center">
+                <div>
+                    <h1>Danh sách sách</h1>
+                    <p>Tìm và thêm sách vào giỏ mượn</p>
+                </div>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="search-box">
+                <div class="search-input">
+                    <span class="search-icon" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%);"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+                    <input type="text" id="search-input" placeholder="Tìm kiếm theo tên, tác giả, ISBN...">
+                </div>
+                <select class="filter-select" id="category-filter">
+                    <option value="">Tất cả danh mục</option>
+                </select>
+            </div>
+
+            <!-- Books Grid -->
+            <div class="books-grid" id="books-container">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </main>
+    </div>
+
+    <!-- Book Detail Modal -->
+    <div class="modal-overlay" id="book-modal">
+        <div class="modal modal-scrollable">
+            <div class="modal-header modal-header-fixed">
+                <h3 id="modal-book-title">Chi tiết sách</h3>
+                <button class="modal-close" onclick="closeModal('book-modal')">&times;</button>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <h4 class="form-section-title">Thông tin sách</h4>
+                <p><strong>Tác giả:</strong> <span id="modal-book-author"></span></p>
+                <p><strong>ISBN:</strong> <span id="modal-book-isbn"></span></p>
+                <p><strong>Danh mục:</strong> <span id="modal-book-category"></span></p>
+                <p><strong>Số lượng còn:</strong> <span id="modal-book-available"></span></p>
+
+                <h4 class="form-section-title">Mô tả</h4>
+                <p id="modal-book-description"></p>
+
+                <h4 class="form-section-title">Mượn sách</h4>
+                <div class="form-group">
+                    <label class="form-label">Số lượng muốn mượn:</label>
+                    <input type="number" class="form-control" id="modal-quantity" min="1" value="1" style="width: 100px;">
+                </div>
+            </div>
+            <div class="modal-footer modal-footer-fixed">
+                <button class="btn btn-primary" id="add-to-wishlist-btn" onclick="addToWishlist()">
+                    Thêm vào giỏ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // Check auth
+        if (!requireAuth()) {
+            // Will redirect
+        }
+
+        let currentPage = 1;
+        const pageSize = 12;
+        let searchQuery = '';
+        let categoryFilter = '';
+        let currentBook = null;
+
+        // Load books
+        async function loadBooks() {
+            const container = document.getElementById('books-container');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                const data = await booksAPI.getBooks(currentPage, pageSize, searchQuery, categoryFilter);
+                renderBooks(data.items);
+                renderPagination(document.getElementById('pagination'), currentPage, data.total_pages, (page) => {
+                    currentPage = page;
+                    loadBooks();
+                });
+            } catch (error) {
+                container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            }
+        }
+
+        function renderBooks(books) {
+            const container = document.getElementById('books-container');
+
+            if (!books || books.length === 0) {
+                showEmptyState(container, 'Không tìm thấy sách nào', 'book');
+                return;
+            }
+
+            container.innerHTML = books.map(book => `
+                <div class="book-card">
+                    <div class="book-cover">
+                        ${book.cover_image
+                            ? `<img src="${book.cover_image}" alt="${book.title}">`
+                            : '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'}
+                    </div>
+                    <div class="book-info">
+                        <h3>${book.title}</h3>
+                        <p>${book.author || 'Không rõ tác giả'}</p>
+                        <p>${book.category || 'Chưa phân loại'}</p>
+                        <p class="book-quantity ${book.available_quantity > 0 ? 'available' : 'unavailable'}">
+                            ${book.available_quantity > 0 ? `Còn ${book.available_quantity} cuốn` : 'Hết sách'}
+                        </p>
+                    </div>
+                    <div class="book-actions">
+                        <button class="btn btn-sm btn-outline" onclick="viewBook(${book.id})">Xem chi tiết</button>
+                        ${book.available_quantity > 0
+                            ? `<button class="btn btn-sm btn-primary" onclick="quickAddToWishlist(${book.id})">+ Giỏ</button>`
+                            : `<button class="btn btn-sm btn-secondary" disabled>Hết sách</button>`
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load categories
+        async function loadCategories() {
+            try {
+                const categories = await booksAPI.getCategories();
+                const select = document.getElementById('category-filter');
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = cat;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // Load wishlist count
+        async function loadWishlistCount() {
+            try {
+                const data = await wishlistAPI.getWishlist();
+                document.getElementById('wishlist-count').textContent = data.total_items;
+                const badge = document.getElementById('wishlist-badge');
+                if (data.total_items > 0) {
+                    badge.textContent = data.total_items;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading wishlist count:', error);
+            }
+        }
+
+        // View book detail
+        async function viewBook(bookId) {
+            try {
+                currentBook = await booksAPI.getBook(bookId);
+                document.getElementById('modal-book-title').textContent = currentBook.title;
+                document.getElementById('modal-book-author').textContent = currentBook.author || '-';
+                document.getElementById('modal-book-isbn').textContent = currentBook.isbn || '-';
+                document.getElementById('modal-book-category').textContent = currentBook.category || '-';
+                document.getElementById('modal-book-available').textContent = currentBook.available_quantity;
+                document.getElementById('modal-book-description').textContent = currentBook.description || 'Không có mô tả';
+                document.getElementById('modal-quantity').value = 1;
+                document.getElementById('modal-quantity').max = currentBook.available_quantity;
+
+                const addBtn = document.getElementById('add-to-wishlist-btn');
+                if (currentBook.available_quantity > 0) {
+                    addBtn.disabled = false;
+                    addBtn.textContent = 'Thêm vào giỏ';
+                } else {
+                    addBtn.disabled = true;
+                    addBtn.textContent = 'Hết sách';
+                }
+
+                openModal('book-modal');
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        // Add to wishlist from modal
+        async function addToWishlist() {
+            if (!currentBook) return;
+
+            const quantity = parseInt(document.getElementById('modal-quantity').value) || 1;
+
+            try {
+                await wishlistAPI.addToWishlist(currentBook.id, quantity);
+                showAlert(`Đã thêm "${currentBook.title}" vào giỏ mượn!`, 'success');
+                closeModal('book-modal');
+                loadWishlistCount();
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        // Quick add to wishlist
+        async function quickAddToWishlist(bookId) {
+            try {
+                await wishlistAPI.addToWishlist(bookId, 1);
+                showAlert('Đã thêm vào giỏ mượn!', 'success');
+                loadWishlistCount();
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        // Search handler
+        const searchInput = document.getElementById('search-input');
+        searchInput.addEventListener('input', debounce((e) => {
+            searchQuery = e.target.value;
+            currentPage = 1;
+            loadBooks();
+        }, 300));
+
+        // Category filter handler
+        document.getElementById('category-filter').addEventListener('change', (e) => {
+            categoryFilter = e.target.value;
+            currentPage = 1;
+            loadBooks();
+        });
+
+        // Init
+        loadBooks();
+        loadCategories();
+        loadWishlistCount();
+
+        // Load sidebar user name
+        const user = getCurrentUser();
+        const sidebarUserName = document.getElementById('sidebar-user-name');
+        if (sidebarUserName && user) {
+            sidebarUserName.textContent = user.full_name || user.username || 'Người dùng';
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu mượn của tôi - Thư viện PTIT</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Thư viện PTIT</h2>
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="dashboard.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></span> <span>Dashboard</span></a></li>
+                <li><a href="books.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></span> <span>Danh sách sách</span></a></li>
+                <li><a href="wishlist.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></span> <span>Giỏ mượn</span></a></li>
+                <li><a href="borrows.html" class="active"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span> <span>Phiếu mượn của tôi</span></a></li>
+                <li><a href="chatbot.html"><span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span> <span>Chatbot AI</span></a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-account-box">
+                    <div class="user-avatar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-user-name">Đang tải...</div>
+                        <div class="user-role">Độc giả</div>
+                    </div>
+                    <button class="btn-logout" onclick="logout()" title="Đăng xuất">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Phiếu mượn của tôi</h1>
+                <p>Theo dõi trạng thái phiếu mượn sách</p>
+            </div>
+
+            <!-- Filter -->
+            <div class="search-box">
+                <select class="filter-select" id="status-filter">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="pending">Chờ duyệt</option>
+                    <option value="approved">Đã duyệt (đang mượn)</option>
+                    <option value="need_edit">Cần chỉnh sửa</option>
+                    <option value="rejected">Từ chối</option>
+                    <option value="returned">Đã trả</option>
+                </select>
+            </div>
+
+            <!-- Borrows List -->
+            <div id="borrows-container">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </main>
+    </div>
+
+    <!-- View Borrow Modal -->
+    <div class="modal-overlay" id="view-modal">
+        <div class="modal modal-scrollable" style="max-width: 600px;">
+            <div class="modal-header modal-header-fixed">
+                <h3>Chi tiết phiếu mượn #<span id="borrow-id"></span></h3>
+                <button class="modal-close" onclick="closeModal('view-modal')">&times;</button>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <h4 class="form-section-title">Thông tin phiếu mượn</h4>
+                <div class="mb-2">
+                    <strong>Trạng thái:</strong> <span id="borrow-status"></span>
+                </div>
+                <div class="mb-2">
+                    <strong>Ngày tạo:</strong> <span id="borrow-created"></span>
+                </div>
+                <div class="mb-2" id="borrow-due-container">
+                    <strong>Hạn trả:</strong> <span id="borrow-due"></span>
+                </div>
+                <div class="mb-2" id="borrow-note-container">
+                    <strong>Ghi chú của bạn:</strong> <span id="borrow-note"></span>
+                </div>
+                <div class="mb-2" id="borrow-admin-note-container">
+                    <strong>Ghi chú của thủ thư:</strong> <span id="borrow-admin-note" class="text-danger"></span>
+                </div>
+
+                <h4 class="form-section-title">Danh sách sách</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tên sách</th>
+                            <th>SL mượn</th>
+                        </tr>
+                    </thead>
+                    <tbody id="borrow-items-body"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer modal-footer-fixed" id="borrow-actions"></div>
+        </div>
+    </div>
+
+    <!-- Edit Borrow Modal -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal modal-scrollable" style="max-width: 600px;">
+            <div class="modal-header modal-header-fixed">
+                <h3>Chỉnh sửa phiếu mượn #<span id="edit-borrow-id"></span></h3>
+                <button class="modal-close" onclick="closeModal('edit-modal')">&times;</button>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <div class="alert alert-warning" id="edit-admin-note"></div>
+
+                <h4 class="form-section-title">Thời hạn</h4>
+                <div class="form-group">
+                    <label class="form-label">Ngày trả sách *:</label>
+                    <input type="date" class="form-control" id="edit-due-date" required style="max-width: 250px;">
+                </div>
+
+                <h4 class="form-section-title">Danh sách sách</h4>
+                <div id="edit-items-container"></div>
+
+                <h4 class="form-section-title">Ghi chú</h4>
+                <div class="form-group">
+                    <label class="form-label">Ghi chú cho thủ thư:</label>
+                    <textarea class="form-control" id="edit-note" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer modal-footer-fixed">
+                <button class="btn btn-primary" onclick="saveBorrowEdit()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // Check auth
+        if (!requireAuth()) {
+            // Will redirect
+        }
+
+        let currentPage = 1;
+        const pageSize = 10;
+        let statusFilter = '';
+        let currentBorrow = null;
+        let editItems = [];
+
+        // Load borrows
+        async function loadBorrows() {
+            const container = document.getElementById('borrows-container');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                const data = await borrowsAPI.getBorrows(currentPage, pageSize, statusFilter);
+                renderBorrows(data.items);
+                renderPagination(document.getElementById('pagination'), currentPage, data.total_pages, (page) => {
+                    currentPage = page;
+                    loadBorrows();
+                });
+            } catch (error) {
+                container.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+            }
+        }
+
+        function renderBorrows(borrows) {
+            const container = document.getElementById('borrows-container');
+
+            if (!borrows || borrows.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <span class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span>
+                        <h3>Chưa có phiếu mượn nào</h3>
+                        <p class="text-muted">Hãy thêm sách vào giỏ và tạo phiếu mượn</p>
+                        <a href="books.html" class="btn btn-primary mt-2">Xem danh sách sách</a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = borrows.map(borrow => `
+                <div class="card mb-2">
+                    <div class="card-body d-flex justify-between align-center">
+                        <div>
+                            <h4>Phiếu mượn #${borrow.id}</h4>
+                            <p class="text-muted">
+                                ${formatDateTime(borrow.created_at)} |
+                                ${borrow.items?.length || 0} đầu sách
+                                ${borrow.due_date ? ` | Hạn trả: ${formatDate(borrow.due_date)}` : ''}
+                            </p>
+                        </div>
+                        <div class="d-flex align-center gap-1">
+                            ${getStatusBadge(borrow.status)}
+                            <button class="btn btn-sm btn-primary" onclick="viewBorrow(${borrow.id})">Chi tiết</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // View borrow
+        async function viewBorrow(borrowId) {
+            try {
+                currentBorrow = await borrowsAPI.getBorrow(borrowId);
+
+                document.getElementById('borrow-id').textContent = currentBorrow.id;
+                document.getElementById('borrow-status').innerHTML = getStatusBadge(currentBorrow.status);
+                document.getElementById('borrow-created').textContent = formatDateTime(currentBorrow.created_at);
+
+                // Due date
+                const dueContainer = document.getElementById('borrow-due-container');
+                if (currentBorrow.due_date) {
+                    dueContainer.style.display = 'block';
+                    document.getElementById('borrow-due').textContent = formatDate(currentBorrow.due_date);
+                } else {
+                    dueContainer.style.display = 'none';
+                }
+
+                // Notes
+                const noteContainer = document.getElementById('borrow-note-container');
+                if (currentBorrow.note) {
+                    noteContainer.style.display = 'block';
+                    document.getElementById('borrow-note').textContent = currentBorrow.note;
+                } else {
+                    noteContainer.style.display = 'none';
+                }
+
+                const adminNoteContainer = document.getElementById('borrow-admin-note-container');
+                if (currentBorrow.admin_note) {
+                    adminNoteContainer.style.display = 'block';
+                    document.getElementById('borrow-admin-note').textContent = currentBorrow.admin_note;
+                } else {
+                    adminNoteContainer.style.display = 'none';
+                }
+
+                // Items
+                const itemsBody = document.getElementById('borrow-items-body');
+                itemsBody.innerHTML = currentBorrow.items.map(item => `
+                    <tr>
+                        <td>${item.book?.title || 'N/A'}</td>
+                        <td>${item.quantity}</td>
+                    </tr>
+                `).join('');
+
+                // Actions
+                const actionsDiv = document.getElementById('borrow-actions');
+                let actionsHtml = '<button class="btn btn-secondary" onclick="closeModal(\'view-modal\')">Đóng</button>';
+
+                if (currentBorrow.status === 'need_edit') {
+                    actionsHtml += `<button class="btn btn-warning" onclick="openEditModal()">Chỉnh sửa</button>`;
+                }
+
+                if (currentBorrow.status === 'pending' || currentBorrow.status === 'need_edit' || currentBorrow.status === 'rejected') {
+                    actionsHtml += `<button class="btn btn-danger" onclick="cancelBorrow()">Hủy phiếu</button>`;
+                }
+
+                actionsDiv.innerHTML = actionsHtml;
+
+                openModal('view-modal');
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        // Open edit modal
+        function openEditModal() {
+            closeModal('view-modal');
+
+            document.getElementById('edit-borrow-id').textContent = currentBorrow.id;
+            document.getElementById('edit-admin-note').textContent = currentBorrow.admin_note || 'Thủ thư yêu cầu bạn chỉnh sửa phiếu mượn';
+            document.getElementById('edit-note').value = currentBorrow.note || '';
+            document.getElementById('edit-due-date').value = currentBorrow.due_date || '';
+
+            editItems = currentBorrow.items.map(item => ({
+                book_id: item.book_id,
+                quantity: item.quantity,
+                book: item.book
+            }));
+
+            renderEditItems();
+            openModal('edit-modal');
+        }
+
+        function renderEditItems() {
+            const container = document.getElementById('edit-items-container');
+
+            container.innerHTML = editItems.map((item, index) => `
+                <div class="wishlist-item" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 10px;">
+                    <div class="wishlist-item-info" style="flex: 1;">
+                        <h4>${item.book?.title || 'N/A'}</h4>
+                        <p class="${item.book?.available_quantity >= item.quantity ? 'text-success' : 'text-danger'}">
+                            Còn ${item.book?.available_quantity || 0} cuốn
+                        </p>
+                    </div>
+                    <div class="wishlist-item-quantity">
+                        <button class="quantity-btn" onclick="updateEditQuantity(${index}, -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" onclick="updateEditQuantity(${index}, 1)">+</button>
+                    </div>
+                    <button class="btn btn-sm btn-danger" onclick="removeEditItem(${index})">Xóa</button>
+                </div>
+            `).join('');
+
+            if (editItems.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">Không còn sách nào. Vui lòng hủy phiếu hoặc thêm sách.</p>';
+            }
+        }
+
+        function updateEditQuantity(index, change) {
+            editItems[index].quantity += change;
+            if (editItems[index].quantity <= 0) {
+                removeEditItem(index);
+            } else {
+                renderEditItems();
+            }
+        }
+
+        function removeEditItem(index) {
+            editItems.splice(index, 1);
+            renderEditItems();
+        }
+
+        // Save borrow edit
+        async function saveBorrowEdit() {
+            if (editItems.length === 0) {
+                showAlert('Phiếu mượn phải có ít nhất 1 cuốn sách!', 'danger');
+                return;
+            }
+
+            const dueDate = document.getElementById('edit-due-date').value;
+            if (!dueDate) {
+                showAlert('Vui lòng chọn ngày trả sách!', 'danger');
+                return;
+            }
+
+            // Kiểm tra ngày trả phải sau ngày hôm nay
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selectedDate = new Date(dueDate);
+            if (selectedDate <= today) {
+                showAlert('Ngày trả phải sau ngày hôm nay!', 'danger');
+                return;
+            }
+
+            const note = document.getElementById('edit-note').value;
+            const items = editItems.map(i => ({
+                book_id: i.book_id,
+                quantity: i.quantity
+            }));
+
+            try {
+                await borrowsAPI.updateBorrow(currentBorrow.id, note, items, dueDate);
+                showAlert('Đã cập nhật phiếu mượn! Vui lòng đợi thủ thư duyệt lại.', 'success');
+                closeModal('edit-modal');
+                loadBorrows();
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        // Cancel borrow
+        async function cancelBorrow() {
+            if (!confirmAction('Bạn có chắc muốn hủy phiếu mượn này?')) return;
+
+            try {
+                await borrowsAPI.deleteBorrow(currentBorrow.id);
+                showAlert('Đã hủy phiếu mượn!', 'success');
+                closeModal('view-modal');
+                loadBorrows();
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        // Status filter handler
+        document.getElementById('status-filter').addEventListener('change', (e) => {
+            statusFilter = e.target.value;
+            currentPage = 1;
+            loadBorrows();
+        });
+
+        // Init
+        loadBorrows();
+
+        // Load sidebar user name
+        const user = getCurrentUser();
+        const sidebarUserName = document.getElementById('sidebar-user-name');
+        if (sidebarUserName && user) {
+            sidebarUserName.textContent = user.full_name || user.username || 'Người dùng';
+        }
+    </script>
+</body>
+</html>
+
