@@ -22,7 +22,7 @@ class Settings:
 
     # OpenRouter API (text generation)
     OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
-    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "cognitivecomputations/dolphin-mistral-24b-venice-edition:free")
+    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "")
 
     @property
     def DATABASE_URL(self) -> str:

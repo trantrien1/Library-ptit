@@ -56,7 +56,7 @@ async def _embedding_with_retry(fn, max_retries: int = 3, base_delay: float = 2.
 
 
 async def generate_text(prompt: str, temperature: float = 0.3) -> str:
-    """Sinh text bằng OpenRouter (Qwen3-4B)."""
+    """Sinh text bằng OpenRouter."""
     response = await _openrouter_client.chat.completions.create(
         model=settings.OPENROUTER_MODEL,
         messages=[{"role": "user", "content": prompt}],
