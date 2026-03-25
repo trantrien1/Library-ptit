@@ -197,7 +197,7 @@ async def create_embeddings():
         books = db.query(Book).all()
         
         if not books:
-            print("ℹ️ Không có sách nào de lam database")
+            print("ℹ️ Không có sách nào  lam database")
             return
         
         print(f"🔄 Đang tạo embeddings cho {len(books)} cuốn sách...")
