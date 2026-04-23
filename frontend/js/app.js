@@ -109,6 +109,12 @@ function formatDateTime(dateString) {
     });
 }
 
+// Format number for charts/statistics
+function formatNumber(value) {
+    const numeric = Number(value) || 0;
+    return numeric.toLocaleString('vi-VN');
+}
+
 // Get status badge
 function getStatusBadge(status) {
     const statusMap = {
@@ -219,6 +225,7 @@ window.hideLoading = hideLoading;
 window.showEmptyState = showEmptyState;
 window.formatDate = formatDate;
 window.formatDateTime = formatDateTime;
+window.formatNumber = formatNumber;
 window.getStatusBadge = getStatusBadge;
 window.openModal = openModal;
 window.closeModal = closeModal;

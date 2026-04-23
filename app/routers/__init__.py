@@ -4,4 +4,6 @@ from .users import router as users_router
 from .wishlist import router as wishlist_router
 from .borrows import router as borrows_router
 from .chatbot import router as chatbot_router
-
+from .admin_stats import router as admin_stats_router
+from .notifications import router as notifications_router
+from .reviews import router as reviews_router

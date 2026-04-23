@@ -3,8 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <title>Dashboard - Thư viện PTIT</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .reminder-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .reminder-list {
+            margin-top: 10px;
+            padding-left: 0;
+            list-style: none;
+        }
+        .reminder-list li {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 6px;
+        }
+        .reminder-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .reminder-item-row .reminder-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: inherit;
+        }
+        .reminder-item-row .reminder-text strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Pill period filter (shared with admin) */
+        .pill-filter-group {
+            display: flex;
+            background: var(--white-color);
+            border-radius: 30px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+        }
+        .pill-filter-group .pill-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 26px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: transparent;
+            color: var(--gray-color);
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+        .pill-filter-group .pill-btn:hover {
+            color: var(--primary-color);
+            background: rgba(173, 23, 28, 0.06);
+        }
+        .pill-filter-group .pill-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 3px 10px rgba(173, 23, 28, 0.3);
+        }
+
+        /* Recent borrows card polish */
+        .recent-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .recent-card-header .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .recent-card-header .header-left svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary-color);
+        }
+        .recent-card-header .header-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--dark-color);
+        }
+
+        /* Stats sub-info */
+        .stat-info .stat-sub {
+            font-size: 12px;
+            color: var(--gray-color);
+            margin-top: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .reminder-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pill-filter-group {
+                align-self: stretch;
+                justify-content: center;
+            }
+            .reminder-item-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard">
@@ -43,6 +160,16 @@
                 <p>Chào mừng đến với Thư viện PTIT</p>
             </div>
 
+            <div class="reminder-toolbar">
+                <div></div>
+                <div class="pill-filter-group" id="reminder-days-group">
+                    <button class="pill-btn" data-days="1">1 ngày</button>
+                    <button class="pill-btn active" data-days="3">3 ngày</button>
+                    <button class="pill-btn" data-days="7">7 ngày</button>
+                </div>
+            </div>
+            <div id="reminder-container"></div>
+
             <!-- Stats Cards -->
             <div class="stats-grid">
                 <div class="stat-card">
@@ -77,8 +204,11 @@
 
             <!-- Recent Borrows -->
             <div class="card">
-                <div class="card-header d-flex justify-between align-center">
-                    <span>Phiếu mượn gần đây</span>
+                <div class="recent-card-header">
+                    <div class="header-left">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        <span class="header-title">Phiếu mượn gần đây</span>
+                    </div>
                     <a href="borrows.html" class="btn btn-sm btn-outline">Xem tất cả</a>
                 </div>
                 <div class="card-body">
@@ -119,6 +249,29 @@
             window.location.href = '../admin/dashboard.html';
         }
 
+        function getReminderDaysAhead() {
+            const activeBtn = document.querySelector('#reminder-days-group .pill-btn.active');
+            return activeBtn ? parseInt(activeBtn.dataset.days, 10) : 3;
+        }
+
+        document.getElementById('reminder-days-group').addEventListener('click', (e) => {
+            const btn = e.target.closest('.pill-btn');
+            if (!btn) return;
+            document.querySelectorAll('#reminder-days-group .pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadDashboard();
+        });
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+
+        function buildBorrowDetailLink(requestId, daysAhead) {
+            return `borrows.html?open_borrow_id=${requestId}&days_ahead=${daysAhead}`;
+        }
+
         // Load dashboard
         async function loadDashboard() {
             const user = getCurrentUser();
@@ -136,8 +289,12 @@
                 const wishlistData = await wishlistAPI.getWishlist();
                 document.getElementById('wishlist-count').textContent = wishlistData.total_items;
 
-                // Load borrows
-                const borrowsData = await borrowsAPI.getBorrows(1, 100);
+                const daysAhead = getReminderDaysAhead();
+                // Load borrows + reminders
+                const [borrowsData, reminders] = await Promise.all([
+                    borrowsAPI.getBorrows(1, 100),
+                    borrowsAPI.getReminders(daysAhead, 5)
+                ]);
 
                 let pending = 0, borrowing = 0, returned = 0;
                 borrowsData.items.forEach(b => {
@@ -150,11 +307,46 @@
                 document.getElementById('borrowing-count').textContent = borrowing;
                 document.getElementById('returned-count').textContent = returned;
 
+                renderReminders(reminders, daysAhead);
                 // Recent borrows
                 renderRecentBorrows(borrowsData.items.slice(0, 5));
             } catch (error) {
                 console.error('Error loading dashboard:', error);
             }
+        }
+
+        function renderReminders(reminderData, daysAhead) {
+            const container = document.getElementById('reminder-container');
+            if (!container) return;
+
+            if (!reminderData || !reminderData.items || reminderData.items.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const alertClass = reminderData.overdue_count > 0 ? 'alert-danger' : 'alert-warning';
+            const title = reminderData.overdue_count > 0
+                ? `Bạn có ${reminderData.overdue_count} phiếu đang quá hạn!`
+                : `Bạn có ${reminderData.due_soon_count} phiếu sắp đến hạn trả.`;
+
+            container.innerHTML = `
+                <div class="alert ${alertClass}">
+                    <strong>${escapeHtml(title)}</strong>
+                    <ul class="reminder-list">
+                        ${reminderData.items.map(item => `
+                            <li>
+                                <div class="reminder-item-row">
+                                    <span class="reminder-text">
+                                        <strong>${escapeHtml(item.message)}</strong>
+                                        ${escapeHtml(item.first_book_title || 'Không rõ tên sách')}, SL: ${item.total_books}
+                                    </span>
+                                    <a class="btn btn-sm btn-outline" href="${buildBorrowDetailLink(item.request_id, daysAhead)}">Xem chi tiết</a>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
         }
 
         function renderRecentBorrows(borrows) {

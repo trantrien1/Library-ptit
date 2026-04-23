@@ -225,6 +225,19 @@ const booksAPI = {
             throw new Error(data.detail || 'Có lỗi xảy ra');
         }
         return true;
+    },
+
+    async uploadPdf(bookId, file) {
+        const formData = new FormData();
+        formData.append('pdf', file);
+        const token = localStorage.getItem('token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        const response = await fetch(`${API_URL}/books/${bookId}/upload-pdf`, {
+            method: 'POST',
+            headers,
+            body: formData
+        });
+        return handleResponse(response);
     }
 };
 
@@ -351,6 +364,13 @@ const borrowsAPI = {
         return handleResponse(response);
     },
 
+    async getReminders(daysAhead = 3, limit = 10) {
+        const response = await fetch(`${API_URL}/borrows/reminders?days_ahead=${daysAhead}&limit=${limit}`, {
+            headers: getHeaders()
+        });
+        return handleResponse(response);
+    },
+
     async createBorrow(note = '', items = null, dueDate = null) {
         const body = { note };
         if (items) body.items = items;
@@ -415,6 +435,152 @@ const borrowsAPI = {
     }
 };
 
+// ===== RENEWAL API =====
+const renewalAPI = {
+    async requestRenewal(borrowId, requestedDays, reason) {
+        const response = await fetch(`${API_URL}/borrows/${borrowId}/renew`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ requested_days: requestedDays, reason })
+        });
+        return handleResponse(response);
+    },
+
+    async getPendingRenewals() {
+        const response = await fetch(`${API_URL}/borrows/renewals`, {
+            headers: getHeaders()
+        });
+        return handleResponse(response);
+    },
+
+    async approveRenewal(renewalId) {
+        const response = await fetch(`${API_URL}/borrows/renewals/${renewalId}/approve`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        return handleResponse(response);
+    },
+
+    async rejectRenewal(renewalId, adminNote) {
+        const response = await fetch(`${API_URL}/borrows/renewals/${renewalId}/reject?admin_note=${encodeURIComponent(adminNote)}`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        return handleResponse(response);
+    }
+};
+
+// ===== WAITLIST API =====
+const waitlistAPI = {
+    async join(bookId, quantity = 1) {
+        const response = await fetch(`${API_URL}/borrows/waitlist`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ book_id: bookId, quantity })
+        });
+        return handleResponse(response);
+    },
+
+    async getMyWaitlist() {
+        const response = await fetch(`${API_URL}/borrows/waitlist`, {
+            headers: getHeaders()
+        });
+        return handleResponse(response);
+    },
+
+    async cancel(waitlistId) {
+        const response = await fetch(`${API_URL}/borrows/waitlist/${waitlistId}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.detail || 'Có lỗi xảy ra');
+        }
+        return true;
+    },
+
+    async getAllWaitlist() {
+        const response = await fetch(`${API_URL}/borrows/admin/waitlist`, {
+            headers: getHeaders()
+        });
+        return handleResponse(response);
+    }
+};
+
+// ===== REVIEWS API =====
+const reviewsAPI = {
+    async getReviews(bookId) {
+        const response = await fetch(`${API_URL}/books/${bookId}/reviews`, {
+            headers: getHeaders(false)
+        });
+        return handleResponse(response);
+    },
+
+    async getSummary(bookId) {
+        const response = await fetch(`${API_URL}/books/${bookId}/reviews/summary`, {
+            headers: getHeaders(false)
+        });
+        return handleResponse(response);
+    },
+
+    async getMyReview(bookId) {
+        const response = await fetch(`${API_URL}/books/${bookId}/reviews/me`, {
+            headers: getHeaders()
+        });
+        if (response.status === 404) return null;
+        return handleResponse(response);
+    },
+
+    async createOrUpdate(bookId, rating, comment) {
+        const response = await fetch(`${API_URL}/books/${bookId}/reviews`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ rating, comment })
+        });
+        return handleResponse(response);
+    },
+
+    async deleteMyReview(bookId) {
+        const response = await fetch(`${API_URL}/books/${bookId}/reviews/me`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.detail || 'Có lỗi xảy ra');
+        }
+        return true;
+    }
+};
+
+// ===== ADMIN STATS API =====
+const adminStatsAPI = {
+    async getOverview(periodDays = 30) {
+        const response = await fetch(`${API_URL}/admin/stats/overview?period_days=${periodDays}`, {
+            headers: getHeaders()
+        });
+        return handleResponse(response);
+    },
+
+    async getBookStats(periodDays = 30, lowStockThreshold = 2, topLimit = 10) {
+        const response = await fetch(
+            `${API_URL}/admin/stats/books?period_days=${periodDays}&low_stock_threshold=${lowStockThreshold}&top_limit=${topLimit}`,
+            {
+                headers: getHeaders()
+            }
+        );
+        return handleResponse(response);
+    },
+
+    async getUserStats(periodDays = 30, topLimit = 10) {
+        const response = await fetch(`${API_URL}/admin/stats/users?period_days=${periodDays}&top_limit=${topLimit}`, {
+            headers: getHeaders()
+        });
+        return handleResponse(response);
+    }
+};
+
 // ===== CHATBOT API =====
 const chatbotAPI = {
     async sendMessage(message, chatHistory = []) {
@@ -448,5 +614,9 @@ window.booksAPI = booksAPI;
 window.usersAPI = usersAPI;
 window.wishlistAPI = wishlistAPI;
 window.borrowsAPI = borrowsAPI;
+window.renewalAPI = renewalAPI;
+window.waitlistAPI = waitlistAPI;
+window.reviewsAPI = reviewsAPI;
+window.adminStatsAPI = adminStatsAPI;
 window.chatbotAPI = chatbotAPI;
 

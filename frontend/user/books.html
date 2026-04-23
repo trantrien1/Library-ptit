@@ -3,8 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <title>Danh sách sách - Thư viện PTIT</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .pdf-preview-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 3000;
+            display: none;
+            flex-direction: column;
+        }
+        .pdf-preview-overlay.show {
+            display: flex;
+        }
+        .pdf-preview-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--white-color);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .pdf-preview-toolbar .toolbar-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 14px;
+            max-width: 400px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .pdf-preview-toolbar .toolbar-info {
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+        .pdf-preview-body {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .pdf-page-container {
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+        .pdf-page-container canvas {
+            display: block;
+        }
+        .pdf-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+        .pdf-preview-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--gray-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .pdf-preview-close:hover {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        /* Reviews */
+        .stars { color: #f59e0b; letter-spacing: 2px; font-size: 18px; }
+        .stars .empty { color: #d1d5db; }
+        .review-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .review-item:last-child { border-bottom: none; }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .review-user { font-weight: 600; font-size: 14px; }
+        .review-date { font-size: 12px; color: var(--gray-color); }
+        .review-comment { font-size: 14px; color: var(--text-color); margin-top: 4px; }
+        .review-form { margin-top: 12px; padding: 12px; background: var(--light-color); border-radius: 8px; }
+        .review-form .star-input { display: flex; gap: 4px; margin-bottom: 8px; }
+        .review-form .star-input span {
+            font-size: 24px; cursor: pointer; color: #d1d5db; transition: color 0.15s;
+        }
+        .review-form .star-input span.active { color: #f59e0b; }
+        .review-form .star-input span:hover { color: #f59e0b; }
+    </style>
 </head>
 <body>
     <div class="dashboard">
@@ -67,7 +173,7 @@
 
     <!-- Book Detail Modal -->
     <div class="modal-overlay" id="book-modal">
-        <div class="modal modal-scrollable">
+        <div class="modal modal-scrollable" style="max-width: 650px;">
             <div class="modal-header modal-header-fixed">
                 <h3 id="modal-book-title">Chi tiết sách</h3>
                 <button class="modal-close" onclick="closeModal('book-modal')">&times;</button>
@@ -78,17 +184,31 @@
                 <p><strong>ISBN:</strong> <span id="modal-book-isbn"></span></p>
                 <p><strong>Danh mục:</strong> <span id="modal-book-category"></span></p>
                 <p><strong>Số lượng còn:</strong> <span id="modal-book-available"></span></p>
+                <p id="modal-book-rating-summary"></p>
 
                 <h4 class="form-section-title">Mô tả</h4>
                 <p id="modal-book-description"></p>
 
                 <h4 class="form-section-title">Mượn sách</h4>
-                <div class="form-group">
+                <div class="form-group" id="modal-borrow-section">
                     <label class="form-label">Số lượng muốn mượn:</label>
                     <input type="number" class="form-control" id="modal-quantity" min="1" value="1" style="width: 100px;">
                 </div>
+
+                <!-- Reviews Section -->
+                <h4 class="form-section-title">Đánh giá sách</h4>
+                <div id="reviews-section">
+                    <p class="text-muted">Đang tải đánh giá...</p>
+                </div>
             </div>
             <div class="modal-footer modal-footer-fixed">
+                <button class="btn btn-secondary" id="preview-pdf-btn" onclick="openPdfPreview()" style="display:none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    Xem thử PDF
+                </button>
+                <button class="btn btn-warning" id="join-waitlist-btn" onclick="joinWaitlist()" style="display:none;">
+                    Vào hàng chờ
+                </button>
                 <button class="btn btn-primary" id="add-to-wishlist-btn" onclick="addToWishlist()">
                     Thêm vào giỏ
                 </button>
@@ -96,9 +216,26 @@
         </div>
     </div>
 
+    <!-- PDF Preview Overlay -->
+    <div class="pdf-preview-overlay" id="pdf-preview-overlay">
+        <div class="pdf-preview-toolbar">
+            <div>
+                <div class="toolbar-title" id="pdf-toolbar-title">Xem thử PDF</div>
+                <div class="toolbar-info" id="pdf-toolbar-info"></div>
+            </div>
+            <button class="pdf-preview-close" onclick="closePdfPreview()" title="Đóng">&times;</button>
+        </div>
+        <div class="pdf-preview-body" id="pdf-preview-body">
+            <div class="pdf-loading" id="pdf-loading">
+                <div class="spinner" style="margin-right:12px;"></div> Đang tải PDF...
+            </div>
+        </div>
+    </div>
+
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         // Check auth
         if (!requireAuth()) {
@@ -155,7 +292,7 @@
                         <button class="btn btn-sm btn-outline" onclick="viewBook(${book.id})">Xem chi tiết</button>
                         ${book.available_quantity > 0
                             ? `<button class="btn btn-sm btn-primary" onclick="quickAddToWishlist(${book.id})">+ Giỏ</button>`
-                            : `<button class="btn btn-sm btn-secondary" disabled>Hết sách</button>`
+                            : `<button class="btn btn-sm btn-warning" onclick="quickJoinWaitlist(${book.id})">Hàng chờ</button>`
                         }
                     </div>
                 </div>
@@ -209,18 +346,114 @@
                 document.getElementById('modal-quantity').max = currentBook.available_quantity;
 
                 const addBtn = document.getElementById('add-to-wishlist-btn');
+                const waitlistBtn = document.getElementById('join-waitlist-btn');
+                const borrowSection = document.getElementById('modal-borrow-section');
+
                 if (currentBook.available_quantity > 0) {
                     addBtn.disabled = false;
                     addBtn.textContent = 'Thêm vào giỏ';
+                    addBtn.style.display = 'inline-flex';
+                    waitlistBtn.style.display = 'none';
+                    borrowSection.style.display = 'block';
                 } else {
-                    addBtn.disabled = true;
-                    addBtn.textContent = 'Hết sách';
+                    addBtn.style.display = 'none';
+                    waitlistBtn.style.display = 'inline-flex';
+                    borrowSection.style.display = 'none';
                 }
 
+                const pdfBtn = document.getElementById('preview-pdf-btn');
+                pdfBtn.style.display = currentBook.pdf_file ? 'inline-flex' : 'none';
+
+                loadBookReviews(bookId);
                 openModal('book-modal');
             } catch (error) {
                 showAlert(error.message, 'danger');
             }
+        }
+
+        // PDF Preview
+        const PDF_MAX_PREVIEW_PAGES = 15;
+        let pdfDoc = null;
+        let pdfRendering = false;
+
+        function openPdfPreview() {
+            if (!currentBook || !currentBook.pdf_file) return;
+            const overlay = document.getElementById('pdf-preview-overlay');
+            const body = document.getElementById('pdf-preview-body');
+            document.getElementById('pdf-toolbar-title').textContent = `Xem thử: ${currentBook.title}`;
+            document.getElementById('pdf-toolbar-info').textContent = '';
+            body.innerHTML = '<div class="pdf-loading" id="pdf-loading"><div class="spinner" style="margin-right:12px;"></div> Đang tải PDF...</div>';
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            const token = localStorage.getItem('token');
+            const pdfUrl = `/api/books/${currentBook.id}/preview-pdf`;
+            const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+            fetch(pdfUrl, { headers })
+                .then(res => {
+                    if (!res.ok) throw new Error('Không thể tải PDF');
+                    return res.arrayBuffer();
+                })
+                .then(data => loadPdf(data))
+                .catch(err => {
+                    body.innerHTML = `<div class="pdf-loading">${err.message}</div>`;
+                });
+        }
+
+        async function loadPdf(data) {
+            const body = document.getElementById('pdf-preview-body');
+            try {
+                pdfDoc = await pdfjsLib.getDocument({ data }).promise;
+                const totalPages = pdfDoc.numPages;
+                const previewPages = Math.min(totalPages, PDF_MAX_PREVIEW_PAGES);
+
+                document.getElementById('pdf-toolbar-info').textContent =
+                    previewPages < totalPages
+                        ? `Đang xem ${previewPages}/${totalPages} trang (xem thử)`
+                        : `${totalPages} trang`;
+
+                body.innerHTML = '';
+                for (let i = 1; i <= previewPages; i++) {
+                    await renderPdfPage(i);
+                }
+            } catch (err) {
+                body.innerHTML = `<div class="pdf-loading">Lỗi hiển thị PDF: ${err.message}</div>`;
+            }
+        }
+
+        async function renderPdfPage(pageNum) {
+            if (pdfRendering) return;
+            pdfRendering = true;
+            const body = document.getElementById('pdf-preview-body');
+
+            const page = await pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const container = document.createElement('div');
+            container.className = 'pdf-page-container';
+
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            container.appendChild(canvas);
+
+            const pageLabel = document.createElement('div');
+            pageLabel.style.cssText = 'text-align:center;padding:6px 0 12px;font-size:12px;color:var(--gray-color);';
+            pageLabel.textContent = `Trang ${pageNum}`;
+            container.appendChild(pageLabel);
+
+            body.appendChild(container);
+
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            pdfRendering = false;
+        }
+
+        function closePdfPreview() {
+            const overlay = document.getElementById('pdf-preview-overlay');
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+            pdfDoc = null;
         }
 
         // Add to wishlist from modal
@@ -264,6 +497,168 @@
             currentPage = 1;
             loadBooks();
         });
+
+        // ===== STARS HELPER =====
+        function renderStars(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                html += i <= rating
+                    ? '<span>&#9733;</span>'
+                    : '<span class="empty">&#9733;</span>';
+            }
+            return html;
+        }
+
+        // ===== REVIEWS =====
+        let currentReviewRating = 0;
+
+        async function loadBookReviews(bookId) {
+            const container = document.getElementById('reviews-section');
+            const ratingSummary = document.getElementById('modal-book-rating-summary');
+
+            try {
+                const [summary, reviews, myReview] = await Promise.all([
+                    reviewsAPI.getSummary(bookId),
+                    reviewsAPI.getReviews(bookId),
+                    reviewsAPI.getMyReview(bookId)
+                ]);
+
+                // Summary
+                if (summary.total_reviews > 0) {
+                    ratingSummary.innerHTML = `<strong>Đánh giá:</strong> <span class="stars">${renderStars(Math.round(summary.average_rating))}</span> ${summary.average_rating}/5 (${summary.total_reviews} đánh giá)`;
+                } else {
+                    ratingSummary.innerHTML = '<strong>Đánh giá:</strong> <span class="text-muted">Chưa có đánh giá</span>';
+                }
+
+                // My review form
+                currentReviewRating = myReview ? myReview.rating : 0;
+
+                let html = '';
+                if (myReview) {
+                    html += `
+                        <div class="review-form">
+                            <p style="font-weight:600; margin-bottom:4px;">Đánh giá của bạn</p>
+                            <div class="stars" style="font-size:18px; margin-bottom:4px;">${renderStars(myReview.rating)}</div>
+                            ${myReview.comment ? `<p style="font-size:14px; margin-bottom:4px;">${escapeHtml(myReview.comment)}</p>` : ''}
+                            <p class="text-muted" style="font-size:13px;">Bạn đã đánh giá sách này. Mỗi sách chỉ được đánh giá 1 lần.</p>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="review-form">
+                            <p style="font-weight:600; margin-bottom:4px;">Viết đánh giá</p>
+                            <p class="text-muted" style="font-size:13px; margin-bottom:8px;">Bạn chỉ có thể đánh giá sách đã từng mượn.</p>
+                            <div class="star-input" id="star-input">${buildStarInput(0)}</div>
+                            <textarea class="form-control" id="review-comment" rows="2" placeholder="Nhập nhận xét của bạn..."></textarea>
+                            <div style="margin-top:8px;">
+                                <button class="btn btn-sm btn-primary" onclick="submitReview()">Gửi đánh giá</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Reviews list
+                if (reviews && reviews.length > 0) {
+                    html += '<div style="margin-top:12px;">';
+                    reviews.forEach(r => {
+                        html += `
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <span class="review-user">${escapeHtml(r.full_name || r.username)}</span>
+                                    <div>
+                                        <span class="stars" style="font-size:14px;">${renderStars(r.rating)}</span>
+                                        <span class="review-date" style="margin-left:8px;">${formatDate(r.created_at)}</span>
+                                    </div>
+                                </div>
+                                ${r.comment ? `<div class="review-comment">${escapeHtml(r.comment)}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                container.innerHTML = html;
+                bindStarInput();
+            } catch (error) {
+                container.innerHTML = `<p class="text-muted">Không thể tải đánh giá.</p>`;
+            }
+        }
+
+        function buildStarInput(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                html += `<span data-value="${i}" class="${i <= rating ? 'active' : ''}">&#9733;</span>`;
+            }
+            return html;
+        }
+
+        function bindStarInput() {
+            const starInput = document.getElementById('star-input');
+            if (!starInput) return;
+            const stars = starInput.querySelectorAll('span[data-value]');
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    currentReviewRating = parseInt(star.dataset.value, 10);
+                    stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.value, 10) <= currentReviewRating));
+                });
+                star.addEventListener('mouseenter', () => {
+                    const val = parseInt(star.dataset.value, 10);
+                    stars.forEach(s => {
+                        s.classList.toggle('active', parseInt(s.dataset.value, 10) <= val);
+                    });
+                });
+            });
+            starInput.addEventListener('mouseleave', () => {
+                stars.forEach(s => {
+                    s.classList.toggle('active', parseInt(s.dataset.value, 10) <= currentReviewRating);
+                });
+            });
+        }
+
+        async function submitReview() {
+            if (!currentBook) return;
+            if (currentReviewRating < 1) {
+                showAlert('Vui lòng chọn số sao (1-5)!', 'danger');
+                return;
+            }
+            const comment = document.getElementById('review-comment').value.trim();
+
+            try {
+                await reviewsAPI.createOrUpdate(currentBook.id, currentReviewRating, comment);
+                showAlert('Đã lưu đánh giá!', 'success');
+                loadBookReviews(currentBook.id);
+                loadBooks();
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+
+        // ===== WAITLIST =====
+        async function joinWaitlist() {
+            if (!currentBook) return;
+            try {
+                await waitlistAPI.join(currentBook.id, 1);
+                showAlert(`Đã vào hàng chờ "${currentBook.title}"!`, 'success');
+                closeModal('book-modal');
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        async function quickJoinWaitlist(bookId) {
+            try {
+                await waitlistAPI.join(bookId, 1);
+                showAlert('Đã vào hàng chờ! Sẽ thông báo khi có sách.', 'success');
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
 
         // Init
         loadBooks();

@@ -25,4 +25,6 @@ class User(Base):
     # Relationships
     wishlist_items = relationship("Wishlist", back_populates="user", cascade="all, delete-orphan")
     borrow_requests = relationship("BorrowRequest", back_populates="user")
+    waitlist_items = relationship("Waitlist", back_populates="user", cascade="all, delete-orphan")
+    reviews = relationship("BookReview", back_populates="user", cascade="all, delete-orphan")
 

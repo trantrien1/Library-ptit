@@ -58,6 +58,7 @@ class BorrowRequestResponse(BaseModel):
     approved_at: Optional[datetime] = None
     due_date: Optional[date] = None
     returned_at: Optional[datetime] = None
+    renewal_count: int = 0
     items: List[BorrowItemResponse]
     user: Optional[UserResponse] = None
 
@@ -71,4 +72,26 @@ class BorrowListResponse(BaseModel):
     page: int
     page_size: int
     total_pages: int
+
+
+class BorrowReminderType(str, Enum):
+    overdue = "overdue"
+    due_soon = "due_soon"
+
+
+class BorrowReminderItem(BaseModel):
+    request_id: int
+    due_date: date
+    days_left: int
+    reminder_type: BorrowReminderType
+    total_books: int
+    first_book_title: Optional[str] = None
+    message: str
+
+
+class BorrowReminderResponse(BaseModel):
+    generated_at: datetime
+    overdue_count: int
+    due_soon_count: int
+    items: List[BorrowReminderItem]
 

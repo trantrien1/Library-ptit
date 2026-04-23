@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <title>Quản lý sách - Admin - Thư viện PTIT</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
@@ -129,6 +130,11 @@
                         <label class="form-label">URL ảnh bìa</label>
                         <input type="text" class="form-control" id="book-cover">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">File mềm (PDF)</label>
+                        <input type="file" class="form-control" id="book-pdf" accept=".pdf" style="padding: 10px;">
+                        <div id="pdf-status" class="form-text" style="display:none;"></div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer modal-footer-fixed">
@@ -222,6 +228,8 @@
             document.getElementById('book-quantity').value = '0';
             document.getElementById('book-description').value = '';
             document.getElementById('book-cover').value = '';
+            document.getElementById('book-pdf').value = '';
+            document.getElementById('pdf-status').style.display = 'none';
             document.getElementById('modal-title').textContent = 'Thêm sách mới';
         }
 
@@ -237,6 +245,14 @@
                 document.getElementById('book-quantity').value = book.quantity;
                 document.getElementById('book-description').value = book.description || '';
                 document.getElementById('book-cover').value = book.cover_image || '';
+                document.getElementById('book-pdf').value = '';
+                const pdfStatus = document.getElementById('pdf-status');
+                if (book.pdf_file) {
+                    pdfStatus.textContent = 'Đã có file PDF. Chọn file mới để thay thế.';
+                    pdfStatus.style.display = 'block';
+                } else {
+                    pdfStatus.style.display = 'none';
+                }
                 document.getElementById('modal-title').textContent = 'Chỉnh sửa sách';
                 openModal('book-modal');
             } catch (error) {
@@ -257,14 +273,25 @@
                 cover_image: document.getElementById('book-cover').value || null
             };
 
+            const pdfInput = document.getElementById('book-pdf');
+            const pdfFile = pdfInput.files[0] || null;
+
             try {
+                let savedBookId = bookId;
                 if (bookId) {
                     await booksAPI.updateBook(bookId, bookData);
                     showAlert('Cập nhật sách thành công!', 'success');
                 } else {
-                    await booksAPI.createBook(bookData);
+                    const result = await booksAPI.createBook(bookData);
+                    savedBookId = result.id;
                     showAlert('Thêm sách thành công!', 'success');
                 }
+
+                if (pdfFile && savedBookId) {
+                    await booksAPI.uploadPdf(savedBookId, pdfFile);
+                    showAlert('Đã tải lên file PDF!', 'success');
+                }
+
                 closeModal('book-modal');
                 loadBooks();
                 loadCategories();

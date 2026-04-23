@@ -8,12 +8,16 @@ Dự án quản lý thư viện cho Học viện Công nghệ Bưu chính Viễn
 - **Quản lý sách**: Thêm, sửa, xóa, tìm kiếm sách
 - **Quản lý độc giả**: Xem, cập nhật thông tin, reset mật khẩu, vô hiệu hóa tài khoản
 - **Quản lý mượn trả**: Duyệt/từ chối phiếu mượn, yêu cầu chỉnh sửa, xác nhận trả sách
+- **Dashboard thống kê**: Biểu đồ Bar/Line/Pie theo bộ lọc thời gian (7/30/90 ngày)
+- **Nhắc hạn chủ động**: Có thể chạy thủ công hoặc chạy scheduler định kỳ để gửi email nhắc hạn
 
 ### Dành cho User (Độc giả)
 - **Xem danh sách sách**: Tìm kiếm, lọc theo danh mục
 - **Giỏ mượn (Wishlist)**: Thêm sách muốn mượn, điều chỉnh số lượng
 - **Tạo phiếu mượn**: Gửi yêu cầu mượn sách, chờ admin duyệt
 - **Theo dõi phiếu mượn**: Xem trạng thái, chỉnh sửa khi cần
+- **Nhắc hạn trả tự động**: Cảnh báo phiếu sắp đến hạn hoặc quá hạn ngay trên dashboard và trang phiếu mượn
+- **Xem nhanh chi tiết phiếu**: Từ banner nhắc hạn có nút mở thẳng modal chi tiết phiếu
 
 ## 🤖 Chatbot AI với RAG
 
@@ -145,6 +149,17 @@ SECRET_KEY=your-super-secret-key-change-this  # ← Đổi thành key bí mật
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
+# Reminder Scheduler + SMTP (tuỳ chọn)
+REMINDER_DAYS_AHEAD_DEFAULT=3
+REMINDER_SCHEDULER_ENABLED=false
+REMINDER_SCHEDULER_INTERVAL_MINUTES=60
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+SMTP_FROM_EMAIL=your_email@gmail.com
+SMTP_USE_TLS=true
+
 # AI Configuration
 GEMINI_API_KEY=your_gemini_api_key  # ← API key từ Google AI Studio
 OPENROUTER_API_KEY=your_openrouter_api_key  # ← API key từ OpenRouter
@@ -190,6 +205,45 @@ Server sẽ chạy tại: http://localhost:8000
 - **Trang chủ**: http://localhost:8000/static/index.html
 - **Đăng nhập**: http://localhost:8000/static/login.html
 - **API Docs**: http://localhost:8000/docs (Swagger UI)
+
+### Demo nhanh API thống kê Admin
+
+Chạy script PowerShell để gọi 3 endpoint thống kê (overview, books, users):
+
+```powershell
+Set-Location d:\Developer\Library-ptit
+.\scripts\demo_admin_stats.ps1 -BaseUrl "http://127.0.0.1:8000" -Username "admin" -Password "admin123" -PeriodDays 30
+```
+
+### Demo nhanh API nhắc hạn trả
+
+Chạy script PowerShell để xem phiếu đang mượn và kết quả nhắc hạn trả theo 2 khung thời gian:
+
+```powershell
+Set-Location d:\Developer\Library-ptit
+.\scripts\demo_due_reminders.ps1 -BaseUrl "http://127.0.0.1:8000" -Username "user1" -Password "123456" -DaysAhead 3
+```
+
+### Demo nhanh scheduler/email nhắc hạn (Admin)
+
+Kiểm tra trạng thái scheduler và chạy nhắc hạn thủ công bằng tài khoản admin:
+
+```powershell
+Set-Location d:\Developer\Library-ptit
+.\scripts\demo_reminder_scheduler.ps1 -BaseUrl "http://127.0.0.1:8000" -Username "admin" -Password "admin123" -DaysAhead 3 -DryRun $true
+```
+
+Hoặc gọi thủ công từng request:
+
+```powershell
+$baseUrl = "http://127.0.0.1:8000"
+$login = Invoke-RestMethod -Method Post -Uri "$baseUrl/api/auth/login" -ContentType "application/x-www-form-urlencoded" -Body "username=admin&password=admin123"
+$headers = @{ Authorization = "Bearer $($login.access_token)" }
+Invoke-RestMethod -Method Get -Uri "$baseUrl/api/admin/notifications/reminders/status" -Headers $headers | ConvertTo-Json -Depth 6
+Invoke-RestMethod -Method Post -Uri "$baseUrl/api/admin/notifications/reminders/run?days_ahead=3&dry_run=true" -Headers $headers | ConvertTo-Json -Depth 6
+```
+
+> Lưu ý: để gửi email thật, cần cấu hình SMTP đầy đủ và đặt `REMINDER_SCHEDULER_ENABLED=true`.
 
 ### Tài khoản mặc định
 

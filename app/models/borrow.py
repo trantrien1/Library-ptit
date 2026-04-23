@@ -23,10 +23,12 @@ class BorrowRequest(Base):
     approved_at = Column(DateTime, nullable=True)
     due_date = Column(Date, nullable=True)
     returned_at = Column(DateTime, nullable=True)
+    renewal_count = Column(Integer, default=0)
 
     # Relationships
     user = relationship("User", back_populates="borrow_requests")
     items = relationship("BorrowItem", back_populates="request", cascade="all, delete-orphan")
+    renewals = relationship("BorrowRenewal", back_populates="request", cascade="all, delete-orphan")
 
 class BorrowItem(Base):
     __tablename__ = "borrow_items"

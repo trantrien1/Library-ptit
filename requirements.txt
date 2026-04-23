@@ -8,6 +8,7 @@ python-multipart>=0.0.6
 python-dotenv>=1.0.0
 pydantic[email]>=2.5.0
 email-validator>=2.0.0
+apscheduler>=3.10.4
 
 # RAG Chatbot
 google-genai>=0.1.0

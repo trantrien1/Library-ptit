@@ -3,8 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg">
     <title>Phiếu mượn của tôi - Thư viện PTIT</title>
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .reminder-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .reminder-list {
+            margin-top: 10px;
+            padding-left: 0;
+            list-style: none;
+        }
+        .reminder-list li {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 6px;
+        }
+        .reminder-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .reminder-item-row .reminder-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: inherit;
+        }
+        .reminder-item-row .reminder-text strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Pill period filter */
+        .pill-filter-group {
+            display: flex;
+            background: var(--white-color);
+            border-radius: 30px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+        }
+        .pill-filter-group .pill-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 26px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: transparent;
+            color: var(--gray-color);
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+        .pill-filter-group .pill-btn:hover {
+            color: var(--primary-color);
+            background: rgba(173, 23, 28, 0.06);
+        }
+        .pill-filter-group .pill-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 3px 10px rgba(173, 23, 28, 0.3);
+        }
+
+        .filters-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filters-row .filter-select {
+            min-width: 170px;
+        }
+
+        @media (max-width: 768px) {
+            .reminder-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .pill-filter-group {
+                align-self: stretch;
+                justify-content: center;
+            }
+            .reminder-item-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+
+        /* Star rating */
+        .star-input { display: flex; gap: 4px; }
+        .star-input span {
+            font-size: 28px; cursor: pointer; color: #d1d5db; transition: color 0.15s;
+        }
+        .star-input span.active { color: #f59e0b; }
+        .star-input span:hover { color: #f59e0b; }
+    </style>
 </head>
 <body>
     <div class="dashboard">
@@ -43,16 +147,28 @@
                 <p>Theo dõi trạng thái phiếu mượn sách</p>
             </div>
 
+            <div class="reminder-toolbar">
+                <div></div>
+                <div class="pill-filter-group" id="reminder-days-group">
+                    <button class="pill-btn" data-days="1">1 ngày</button>
+                    <button class="pill-btn active" data-days="3">3 ngày</button>
+                    <button class="pill-btn" data-days="7">7 ngày</button>
+                </div>
+            </div>
+            <div id="reminder-container"></div>
+
             <!-- Filter -->
             <div class="search-box">
-                <select class="filter-select" id="status-filter">
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="pending">Chờ duyệt</option>
-                    <option value="approved">Đã duyệt (đang mượn)</option>
-                    <option value="need_edit">Cần chỉnh sửa</option>
-                    <option value="rejected">Từ chối</option>
-                    <option value="returned">Đã trả</option>
-                </select>
+                <div class="filters-row">
+                    <select class="filter-select" id="status-filter">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="pending">Chờ duyệt</option>
+                        <option value="approved">Đã duyệt (đang mượn)</option>
+                        <option value="need_edit">Cần chỉnh sửa</option>
+                        <option value="rejected">Từ chối</option>
+                        <option value="returned">Đã trả</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Borrows List -->
@@ -81,6 +197,9 @@
                 </div>
                 <div class="mb-2" id="borrow-due-container">
                     <strong>Hạn trả:</strong> <span id="borrow-due"></span>
+                </div>
+                <div class="mb-2" id="borrow-renewal-count-container" style="display:none;">
+                    <strong>Số lần gia hạn:</strong> <span id="borrow-renewal-count"></span>
                 </div>
                 <div class="mb-2" id="borrow-note-container">
                     <strong>Ghi chú của bạn:</strong> <span id="borrow-note"></span>
@@ -135,6 +254,71 @@
         </div>
     </div>
 
+    <!-- Renewal Request Modal -->
+    <div class="modal-overlay" id="renewal-modal">
+        <div class="modal modal-scrollable" style="max-width: 500px;">
+            <div class="modal-header modal-header-fixed">
+                <h3>Gia hạn mượn sách</h3>
+                <button class="modal-close" onclick="closeModal('renewal-modal')">&times;</button>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <div class="alert alert-info" id="renewal-info"></div>
+
+                <h4 class="form-section-title">Số ngày gia hạn</h4>
+                <div class="form-group">
+                    <select class="form-control" id="renewal-days" style="max-width: 200px;">
+                        <option value="7">7 ngày</option>
+                        <option value="14">14 ngày</option>
+                        <option value="30">30 ngày</option>
+                    </select>
+                </div>
+
+                <h4 class="form-section-title">Lý do gia hạn</h4>
+                <div class="form-group">
+                    <textarea class="form-control" id="renewal-reason" rows="3" placeholder="Nhập lý do muốn gia hạn..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer modal-footer-fixed">
+                <button class="btn btn-warning" onclick="submitRenewal()">Gửi yêu cầu gia hạn</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" id="review-modal">
+        <div class="modal modal-scrollable" style="max-width: 500px;">
+            <div class="modal-header modal-header-fixed">
+                <h3>Đánh giá sách</h3>
+                <button class="modal-close" onclick="closeModal('review-modal')">&times;</button>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <h4 class="form-section-title">Chọn sách cần đánh giá</h4>
+                <div class="form-group">
+                    <select class="form-control" id="review-book-select" style="max-width: 100%;">
+                        <option value="">-- Chọn sách --</option>
+                    </select>
+                </div>
+
+                <div id="review-form-area" style="display:none;">
+                    <h4 class="form-section-title">Chấm sao</h4>
+                    <div class="star-input" id="star-input" style="margin-bottom: 12px;"></div>
+
+                    <h4 class="form-section-title">Nhận xét</h4>
+                    <div class="form-group">
+                        <textarea class="form-control" id="review-comment" rows="3" placeholder="Nhập nhận xét của bạn về cuốn sách..."></textarea>
+                    </div>
+
+                    <div id="review-existing" style="display:none;" class="alert alert-info">
+                        <p style="margin:0;">Bạn đã đánh giá sách này. Gửi sẽ cập nhật đánh giá cũ.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer modal-footer-fixed">
+                <button class="btn btn-primary" id="review-submit-btn" onclick="submitReviewFromBorrow()" disabled>Gửi đánh giá</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/app.js"></script>
@@ -149,6 +333,91 @@
         let statusFilter = '';
         let currentBorrow = null;
         let editItems = [];
+
+        function getReminderDaysAhead() {
+            const activeBtn = document.querySelector('#reminder-days-group .pill-btn.active');
+            return activeBtn ? parseInt(activeBtn.dataset.days, 10) : 3;
+        }
+
+        function setPillActive(days) {
+            document.querySelectorAll('#reminder-days-group .pill-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.dataset.days, 10) === days);
+            });
+        }
+
+        function applyDaysAheadFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const daysAhead = parseInt(params.get('days_ahead') || '', 10);
+            if (daysAhead && [1, 3, 7].includes(daysAhead)) {
+                setPillActive(daysAhead);
+            }
+        }
+
+        document.getElementById('reminder-days-group').addEventListener('click', (e) => {
+            const btn = e.target.closest('.pill-btn');
+            if (!btn) return;
+            document.querySelectorAll('#reminder-days-group .pill-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadReminders();
+        });
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str || '';
+            return div.innerHTML;
+        }
+
+        async function openBorrowFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const borrowId = parseInt(params.get('open_borrow_id') || '', 10);
+            if (!borrowId) return;
+            await viewBorrow(borrowId);
+
+            params.delete('open_borrow_id');
+            const query = params.toString();
+            const target = query ? `borrows.html?${query}` : 'borrows.html';
+            window.history.replaceState({}, '', target);
+        }
+
+        async function loadReminders() {
+            const container = document.getElementById('reminder-container');
+            if (!container) return;
+
+            try {
+                const daysAhead = getReminderDaysAhead();
+                const reminderData = await borrowsAPI.getReminders(daysAhead, 6);
+                if (!reminderData.items || reminderData.items.length === 0) {
+                    container.innerHTML = '';
+                    return;
+                }
+
+                const alertClass = reminderData.overdue_count > 0 ? 'alert-danger' : 'alert-warning';
+                const title = reminderData.overdue_count > 0
+                    ? `Bạn có ${reminderData.overdue_count} phiếu đang quá hạn!`
+                    : `Bạn có ${reminderData.due_soon_count} phiếu sắp đến hạn trả.`;
+
+                container.innerHTML = `
+                    <div class="alert ${alertClass}">
+                        <strong>${escapeHtml(title)}</strong>
+                        <ul class="reminder-list">
+                            ${reminderData.items.map(item => `
+                                <li>
+                                    <div class="reminder-item-row">
+                                        <span class="reminder-text">
+                                            <strong>${escapeHtml(item.message)}</strong>
+                                            ${escapeHtml(item.first_book_title || 'Không rõ tên sách')}, SL: ${item.total_books}
+                                        </span>
+                                        <button class="btn btn-sm btn-outline" onclick="viewBorrow(${item.request_id})">Xem chi tiết</button>
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading reminders:', error);
+            }
+        }
 
         // Load borrows
         async function loadBorrows() {
@@ -196,6 +465,7 @@
                         <div class="d-flex align-center gap-1">
                             ${getStatusBadge(borrow.status)}
                             <button class="btn btn-sm btn-primary" onclick="viewBorrow(${borrow.id})">Chi tiết</button>
+                            ${borrow.status === 'returned' ? `<button class="btn btn-sm btn-warning" onclick="openReviewModal(${borrow.id})">Đánh giá</button>` : ''}
                         </div>
                     </div>
                 </div>
@@ -218,6 +488,15 @@
                     document.getElementById('borrow-due').textContent = formatDate(currentBorrow.due_date);
                 } else {
                     dueContainer.style.display = 'none';
+                }
+
+                // Renewal count
+                const renewalCountContainer = document.getElementById('borrow-renewal-count-container');
+                if (currentBorrow.renewal_count > 0) {
+                    renewalCountContainer.style.display = 'block';
+                    document.getElementById('borrow-renewal-count').textContent = currentBorrow.renewal_count;
+                } else {
+                    renewalCountContainer.style.display = 'none';
                 }
 
                 // Notes
@@ -256,6 +535,14 @@
 
                 if (currentBorrow.status === 'pending' || currentBorrow.status === 'need_edit' || currentBorrow.status === 'rejected') {
                     actionsHtml += `<button class="btn btn-danger" onclick="cancelBorrow()">Hủy phiếu</button>`;
+                }
+
+                if (currentBorrow.status === 'approved' && currentBorrow.due_date) {
+                    actionsHtml += `<button class="btn btn-warning" onclick="openRenewalModal()">Gia hạn mượn</button>`;
+                }
+
+                if (currentBorrow.status === 'returned') {
+                    actionsHtml += `<button class="btn btn-warning" onclick="openReviewModal(${currentBorrow.id})">Đánh giá sách</button>`;
                 }
 
                 actionsDiv.innerHTML = actionsHtml;
@@ -376,6 +663,141 @@
             }
         }
 
+        // Renewal
+        function openRenewalModal() {
+            closeModal('view-modal');
+            const maxRenewal = 2;
+            const remaining = maxRenewal - (currentBorrow.renewal_count || 0);
+            document.getElementById('renewal-info').innerHTML =
+                `<div>Phiếu mượn #${currentBorrow.id}</div>` +
+                `<div>Hạn trả hiện tại: <strong>${formatDate(currentBorrow.due_date)}</strong></div>` +
+                `<div>Đã gia hạn: <strong>${currentBorrow.renewal_count || 0}</strong>/${maxRenewal} lần (còn ${remaining} lần)</div>`;
+            document.getElementById('renewal-days').value = '7';
+            document.getElementById('renewal-reason').value = '';
+            openModal('renewal-modal');
+        }
+
+        async function submitRenewal() {
+            const days = parseInt(document.getElementById('renewal-days').value, 10);
+            const reason = document.getElementById('renewal-reason').value.trim();
+
+            try {
+                await renewalAPI.requestRenewal(currentBorrow.id, days, reason);
+                showAlert('Đã gửi yêu cầu gia hạn! Vui lòng đợi thủ thư duyệt.', 'success');
+                closeModal('renewal-modal');
+                loadBorrows();
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
+        // ===== REVIEW FROM BORROWS =====
+        let reviewRating = 0;
+
+        async function openReviewModal(borrowId) {
+            closeModal('view-modal');
+            reviewRating = 0;
+
+            const borrow = await borrowsAPI.getBorrow(borrowId);
+            const select = document.getElementById('review-book-select');
+            select.innerHTML = '<option value="">-- Chọn sách --</option>';
+            (borrow.items || []).forEach(item => {
+                if (item.book) {
+                    const opt = document.createElement('option');
+                    opt.value = item.book_id;
+                    opt.textContent = item.book.title;
+                    select.appendChild(opt);
+                }
+            });
+
+            document.getElementById('review-form-area').style.display = 'none';
+            document.getElementById('review-existing').style.display = 'none';
+            document.getElementById('review-comment').value = '';
+            document.getElementById('review-submit-btn').disabled = true;
+
+            select.onchange = async () => {
+                const bookId = parseInt(select.value, 10);
+                if (!bookId) {
+                    document.getElementById('review-form-area').style.display = 'none';
+                    document.getElementById('review-submit-btn').disabled = true;
+                    return;
+                }
+                document.getElementById('review-form-area').style.display = 'block';
+
+                try {
+                    const myReview = await reviewsAPI.getMyReview(bookId);
+                    if (myReview) {
+                        reviewRating = myReview.rating;
+                        document.getElementById('review-comment').value = myReview.comment || '';
+                        document.getElementById('review-comment').readOnly = true;
+                        document.getElementById('review-existing').style.display = 'block';
+                        document.getElementById('review-existing').innerHTML = '<p style="margin:0;">Bạn đã đánh giá sách này. Mỗi sách chỉ được đánh giá 1 lần.</p>';
+                        document.getElementById('review-submit-btn').style.display = 'none';
+                    } else {
+                        reviewRating = 0;
+                        document.getElementById('review-comment').value = '';
+                        document.getElementById('review-comment').readOnly = false;
+                        document.getElementById('review-existing').style.display = 'none';
+                        document.getElementById('review-submit-btn').style.display = 'inline-flex';
+                        document.getElementById('review-submit-btn').disabled = true;
+                    }
+                } catch {
+                    reviewRating = 0;
+                    document.getElementById('review-comment').value = '';
+                    document.getElementById('review-comment').readOnly = false;
+                    document.getElementById('review-existing').style.display = 'none';
+                    document.getElementById('review-submit-btn').style.display = 'inline-flex';
+                    document.getElementById('review-submit-btn').disabled = true;
+                }
+                renderStarInput();
+            };
+
+            openModal('review-modal');
+        }
+
+        function renderStarInput() {
+            const container = document.getElementById('star-input');
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                html += `<span data-value="${i}" class="${i <= reviewRating ? 'active' : ''}">&#9733;</span>`;
+            }
+            container.innerHTML = html;
+
+            const stars = container.querySelectorAll('span[data-value]');
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    reviewRating = parseInt(star.dataset.value, 10);
+                    stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.value, 10) <= reviewRating));
+                    document.getElementById('review-submit-btn').disabled = false;
+                });
+                star.addEventListener('mouseenter', () => {
+                    const val = parseInt(star.dataset.value, 10);
+                    stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.value, 10) <= val));
+                });
+            });
+            container.addEventListener('mouseleave', () => {
+                stars.forEach(s => s.classList.toggle('active', parseInt(s.dataset.value, 10) <= reviewRating));
+            });
+        }
+
+        async function submitReviewFromBorrow() {
+            const bookId = parseInt(document.getElementById('review-book-select').value, 10);
+            if (!bookId) return;
+            if (reviewRating < 1) {
+                showAlert('Vui lòng chọn số sao (1-5)!', 'danger');
+                return;
+            }
+            const comment = document.getElementById('review-comment').value.trim();
+
+            try {
+                await reviewsAPI.createOrUpdate(bookId, reviewRating, comment);
+                showAlert('Đã lưu đánh giá!', 'success');
+                closeModal('review-modal');
+            } catch (error) {
+                showAlert(error.message, 'danger');
+            }
+        }
+
         // Status filter handler
         document.getElementById('status-filter').addEventListener('change', (e) => {
             statusFilter = e.target.value;
@@ -384,7 +806,10 @@
         });
 
         // Init
+        applyDaysAheadFromQuery();
+        loadReminders();
         loadBorrows();
+        openBorrowFromQuery();
 
         // Load sidebar user name
         const user = getCurrentUser();

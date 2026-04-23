@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile app/routers/notifications.py app/services/notifications/reminder_scheduler.py app/services/notifications/reminder_sender.py app/schemas/notification.py)",
+      "Bash(python -m py_compile app/models/book.py)",
+      "Bash(python -m py_compile app/schemas/book.py)",
+      "Bash(python -m py_compile app/config.py)",
+      "Bash(python -m py_compile app/routers/books.py)",
+      "Bash(python -m py_compile main.py)",
+      "Bash(python -c ' *)",
+      "Bash(python -m py_compile app/schemas/renewal.py)",
+      "Bash(python -m py_compile app/schemas/waitlist.py)",
+      "Bash(python -m py_compile app/schemas/review.py)",
+      "Bash(python -m py_compile app/schemas/borrow.py)",
+      "Bash(python -m py_compile app/schemas/__init__.py)",
+      "Bash(python -c \"from app.models import BorrowRenewal, Waitlist, BookReview; from app.schemas.renewal import BorrowRenewalCreate; from app.schemas.waitlist import WaitlistCreate; from app.schemas.review import ReviewCreate; print\\('All imports OK'\\)\")",
+      "Bash(python -m py_compile app/routers/borrows.py)"
+    ]
+  }
+}

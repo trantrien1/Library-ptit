@@ -15,10 +15,13 @@ class Book(Base):
     quantity = Column(Integer, default=0)
     available_quantity = Column(Integer, default=0)
     cover_image = Column(String(255))
+    pdf_file = Column(String(255))
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     # Relationships
     wishlist_items = relationship("Wishlist", back_populates="book", cascade="all, delete-orphan")
     borrow_items = relationship("BorrowItem", back_populates="book")
+    waitlist_items = relationship("Waitlist", back_populates="book", cascade="all, delete-orphan")
+    reviews = relationship("BookReview", back_populates="book", cascade="all, delete-orphan")
 

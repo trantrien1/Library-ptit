@@ -11,6 +11,7 @@ class BookBase(BaseModel):
     description: Optional[str] = None
     quantity: int = 0
     cover_image: Optional[str] = None
+    pdf_file: Optional[str] = None
 
 # Schema cho tạo sách
 class BookCreate(BookBase):
@@ -25,6 +26,7 @@ class BookUpdate(BaseModel):
     description: Optional[str] = None
     quantity: Optional[int] = None
     cover_image: Optional[str] = None
+    pdf_file: Optional[str] = None
 
 # Schema response
 class BookResponse(BookBase):

@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+import os
+import time
+
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status, Query
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import Optional
 from math import ceil
+from ..config import settings
 from ..database import get_db
 from ..models.book import Book
 from ..models.user import User
@@ -172,4 +177,65 @@ async def delete_book(
     db.commit()
 
     return None
+
+
+@router.post("/{book_id}/upload-pdf", response_model=BookResponse)
+async def upload_book_pdf(
+    book_id: int,
+    pdf: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin),
+):
+    """Upload PDF file for a book (Admin only)."""
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sách")
+
+    if not pdf.filename or not pdf.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Chỉ chấp nhận file PDF")
+
+    pdf_dir = os.path.join(settings.UPLOAD_DIR, "books")
+    os.makedirs(pdf_dir, exist_ok=True)
+
+    filename = f"{book_id}_{int(time.time())}.pdf"
+    filepath = os.path.join(pdf_dir, filename)
+
+    content = await pdf.read()
+    if len(content) > 50 * 1024 * 1024:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File PDF quá lớn (tối đa 50MB)")
+
+    with open(filepath, "wb") as f:
+        f.write(content)
+
+    book.pdf_file = f"books/{filename}"
+    db.commit()
+    db.refresh(book)
+
+    return book
+
+
+@router.get("/{book_id}/preview-pdf")
+async def preview_book_pdf(
+    book_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Serve PDF file for preview (logged-in users)."""
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sách")
+
+    if not book.pdf_file:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sách này chưa có file PDF")
+
+    filepath = os.path.join(settings.UPLOAD_DIR, book.pdf_file)
+    if not os.path.isfile(filepath):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File PDF không tồn tại")
+
+    return FileResponse(
+        filepath,
+        media_type="application/pdf",
+        filename=f"{book.title}.pdf",
+        headers={"Content-Disposition": "inline"},
+    )
 
