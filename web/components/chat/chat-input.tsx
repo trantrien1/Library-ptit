@@ -1,6 +1,6 @@
 "use client";
 
-import { CornerDownLeft, Loader2, Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,9 @@ interface ChatInputProps {
 	onSend: () => void;
 }
 
+const controlClassName =
+	"h-9 rounded-full border-border/70 bg-muted/60 text-foreground shadow-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30";
+
 export function ChatInput({
 	value,
 	loading,
@@ -44,73 +47,83 @@ export function ChatInput({
 	onSend,
 }: ChatInputProps) {
 	const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
 	const selectedMode = useMemo(
 		() => modes.find((mode) => mode.id === selectedModeId) || modes[0],
 		[modes, selectedModeId],
 	);
+
+	const SelectedModeIcon = selectedMode?.icon;
 	const structuredMode = selectedModeId === "quiz" || selectedModeId === "flashcard";
-	const updateOptions = (patch: Partial<ChatModeOptions>) => onModeOptionsChange({ ...modeOptions, ...patch });
+
+	const updateOptions = (patch: Partial<ChatModeOptions>) => {
+		onModeOptionsChange({ ...modeOptions, ...patch });
+	};
 
 	useEffect(() => {
 		const textarea = textareaRef.current;
 		if (!textarea) return;
+
 		textarea.style.height = "auto";
-		textarea.style.height = `${Math.min(textarea.scrollHeight, 180)}px`;
+		textarea.style.height = `${Math.min(textarea.scrollHeight, 220)}px`;
 	}, [value]);
 
-	return (
-		<div className="bg-gradient-to-t from-background via-background to-background/70 px-3 pb-4 pt-3 backdrop-blur sm:px-6 sm:pb-6">
-			<div className="mx-auto max-w-3xl">
-				<div className="rounded-2xl border bg-background p-2 shadow-lg transition-shadow duration-200 focus-within:shadow-xl">
-					<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-						<label className="sr-only" htmlFor="chat-mode">
-							Chọn chức năng chatbot
-						</label>
-						<Select
-							value={selectedModeId}
-							onValueChange={onModeChange}
-						>
-							<SelectTrigger
-								id="chat-mode"
-								className="h-10 w-full rounded-xl border-border bg-muted/50 text-sm font-medium shadow-none transition hover:bg-muted focus:ring-2 focus:ring-primary/20 sm:w-56"
-							>
-								<SelectValue placeholder="Chọn chức năng" />
-							</SelectTrigger>
-							<SelectContent className="rounded-xl border-border p-1 shadow-xl">
-								{modes.map((mode) => {
-									const Icon = mode.icon;
+	const handleSend = () => {
+		if (!value.trim() || loading) return;
+		onSend();
+	};
 
-									return (
-										<SelectItem
-											key={mode.id}
-											value={mode.id}
-											className="rounded-lg py-2.5 pl-2 pr-8"
-										>
-											<Icon className="h-4 w-4 text-primary" />
-											<span>{mode.label}</span>
-										</SelectItem>
-									);
-								})}
+	return (
+		<div className="z-20 px-3 pb-4 pt-4 sm:px-6 sm:pb-6">
+			<div className="mx-auto w-full max-w-3xl">
+				<div className="rounded-[2rem] border border-border/70 bg-background/92 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur-xl dark:shadow-[0_20px_70px_rgba(0,0,0,0.35)]">
+					<div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-3 py-3 sm:px-4">
+						<Select value={selectedModeId} onValueChange={onModeChange}>
+							<SelectTrigger
+								className={cn(
+									controlClassName,
+									"min-w-[180px] justify-start gap-2 px-3 text-sm font-medium",
+								)}
+							>
+								<div className="flex min-w-0 items-center gap-2">
+									{SelectedModeIcon ? (
+										<SelectedModeIcon className="h-4 w-4 shrink-0 text-primary" />
+									) : null}
+									<SelectValue placeholder="Chọn chức năng" />
+								</div>
+							</SelectTrigger>
+							<SelectContent className="rounded-2xl">
+								{modes.map((mode) => (
+									<SelectItem key={mode.id} value={mode.id} className="rounded-xl py-2.5">
+										{mode.label}
+									</SelectItem>
+								))}
 							</SelectContent>
 						</Select>
-						<div className="hidden min-w-0 flex-1 truncate text-xs text-muted-foreground sm:block">
-							{selectedMode?.description}
-						</div>
+
+						{loading ? (
+							<div className="flex items-center gap-2 text-xs text-muted-foreground">
+								<Loader2 className="h-3.5 w-3.5 animate-spin" />
+								AI typing...
+							</div>
+						) : null}
 					</div>
 
 					{structuredMode ? (
-						<div className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-muted/40 p-2">
+						<div className="flex flex-wrap items-center gap-2 border-b border-border/60 px-3 py-3 sm:px-4">
 							{selectedModeId === "quiz" ? (
 								<Select
 									value={String(modeOptions.questionCount)}
-									onValueChange={(value) => updateOptions({ questionCount: Number(value) })}
+									onValueChange={(nextValue) =>
+										updateOptions({ questionCount: Number(nextValue) })
+									}
 								>
-									<SelectTrigger className="h-9 w-[128px] rounded-lg bg-background">
+									<SelectTrigger className={cn(controlClassName, "w-[132px] text-xs")}>
 										<SelectValue />
 									</SelectTrigger>
-									<SelectContent className="rounded-xl p-1">
+									<SelectContent className="rounded-2xl">
 										{[5, 10, 15, 20].map((count) => (
-											<SelectItem key={count} value={String(count)} className="rounded-lg">
+											<SelectItem key={count} value={String(count)} className="rounded-xl">
 												{count} câu
 											</SelectItem>
 										))}
@@ -119,42 +132,63 @@ export function ChatInput({
 							) : (
 								<Select
 									value={String(modeOptions.cardCount)}
-									onValueChange={(value) => updateOptions({ cardCount: Number(value) })}
+									onValueChange={(nextValue) =>
+										updateOptions({ cardCount: Number(nextValue) })
+									}
 								>
-									<SelectTrigger className="h-9 w-[128px] rounded-lg bg-background">
+									<SelectTrigger className={cn(controlClassName, "w-[132px] text-xs")}>
 										<SelectValue />
 									</SelectTrigger>
-									<SelectContent className="rounded-xl p-1">
+									<SelectContent className="rounded-2xl">
 										{[5, 10, 20].map((count) => (
-											<SelectItem key={count} value={String(count)} className="rounded-lg">
+											<SelectItem key={count} value={String(count)} className="rounded-xl">
 												{count} thẻ
 											</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
 							)}
+
 							<Select
 								value={modeOptions.difficulty}
-								onValueChange={(value) => updateOptions({ difficulty: value as ChatModeOptions["difficulty"] })}
+								onValueChange={(nextValue) =>
+									updateOptions({
+										difficulty: nextValue as ChatModeOptions["difficulty"],
+									})
+								}
 							>
-								<SelectTrigger className="h-9 w-[142px] rounded-lg bg-background">
+								<SelectTrigger className={cn(controlClassName, "w-[148px] text-xs")}>
 									<SelectValue />
 								</SelectTrigger>
-								<SelectContent className="rounded-xl p-1">
-									<SelectItem value="mixed" className="rounded-lg">Trộn mức độ</SelectItem>
-									<SelectItem value="easy" className="rounded-lg">Dễ</SelectItem>
-									<SelectItem value="medium" className="rounded-lg">Trung bình</SelectItem>
-									<SelectItem value="hard" className="rounded-lg">Khó</SelectItem>
+								<SelectContent className="rounded-2xl">
+									<SelectItem value="mixed" className="rounded-xl">
+										Trộn mức độ
+									</SelectItem>
+									<SelectItem value="easy" className="rounded-xl">
+										Dễ
+									</SelectItem>
+									<SelectItem value="medium" className="rounded-xl">
+										Trung bình
+									</SelectItem>
+									<SelectItem value="hard" className="rounded-xl">
+										Khó
+									</SelectItem>
 								</SelectContent>
 							</Select>
+
 							{selectedModeId === "quiz" ? (
-								<div className="ml-auto flex items-center gap-2 rounded-lg px-2">
+								<div className="ml-auto flex items-center gap-2 rounded-full border border-border/60 bg-muted/40 px-3 py-1.5">
 									<Switch
 										id="quiz-explanations"
 										checked={modeOptions.includeExplanations}
-										onCheckedChange={(checked) => updateOptions({ includeExplanations: checked })}
+										onCheckedChange={(checked) =>
+											updateOptions({ includeExplanations: checked })
+										}
 									/>
-									<Label htmlFor="quiz-explanations" className="cursor-pointer text-xs text-muted-foreground">
+									<Label
+										htmlFor="quiz-explanations"
+										className="cursor-pointer text-xs text-muted-foreground"
+									>
 										Có giải thích
 									</Label>
 								</div>
@@ -162,44 +196,46 @@ export function ChatInput({
 						</div>
 					) : null}
 
-					<Textarea
-						ref={textareaRef}
-						value={value}
-						onChange={(event) => onChange(event.target.value)}
-						onKeyDown={(event) => {
-							if (event.key === "Enter" && !event.shiftKey) {
-								event.preventDefault();
-								onSend();
+					<div className="px-3 pb-3 pt-2 sm:px-4 sm:pb-4">
+						<Textarea
+							ref={textareaRef}
+							value={value}
+							onChange={(event) => onChange(event.target.value)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter" && !event.shiftKey) {
+									event.preventDefault();
+									handleSend();
+								}
+							}}
+							rows={1}
+							placeholder={
+								placeholder ||
+								selectedMode?.placeholder ||
+								"Nhập câu hỏi về tài liệu, khái niệm hoặc nội dung bạn đang học..."
 							}
-						}}
-						rows={1}
-						placeholder={placeholder || selectedMode?.placeholder || "Nhập tin nhắn..."}
-						className="max-h-[180px] min-h-11 resize-none border-0 bg-transparent px-2 py-2 shadow-none focus-visible:ring-0"
-					/>
-					<div className="flex items-center justify-between gap-3 px-2 pt-1">
-						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-							{loading ? (
-								<>
-									<Loader2 className="h-3.5 w-3.5 animate-spin" />
-									AI typing...
-								</>
-							) : (
-								<>
-									<CornerDownLeft className="h-3.5 w-3.5" />
-									Enter để gửi, Shift+Enter xuống dòng
-								</>
-							)}
+							className="min-h-[96px] max-h-[220px] resize-none border-0 bg-transparent px-0 pb-3 pt-2 text-[15px] leading-7 shadow-none focus-visible:ring-0"
+						/>
+
+						<div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3">
+							<p className="min-w-0 text-xs leading-5 text-muted-foreground">
+								{selectedMode?.description}
+							</p>
+
+							<Button
+								type="button"
+								size="icon"
+								onClick={handleSend}
+								disabled={loading || !value.trim()}
+								className="h-10 w-10 rounded-full shadow-sm"
+								title="Gửi tin nhắn"
+							>
+								{loading ? (
+									<Loader2 className="h-4 w-4 animate-spin" />
+								) : (
+									<Send className="h-4 w-4" />
+								)}
+							</Button>
 						</div>
-						<Button
-							type="button"
-							size="icon"
-							onClick={onSend}
-							disabled={loading || !value.trim()}
-							className={cn("h-9 w-9 rounded-lg", value.trim() && "shadow-sm")}
-							title="Gửi tin nhắn"
-						>
-							{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-						</Button>
 					</div>
 				</div>
 			</div>

@@ -238,7 +238,7 @@ export function ProgressRing({
 					cy="60"
 					r={radius}
 					fill="none"
-					stroke="hsl(var(--primary))"
+					stroke="var(--primary)"
 					strokeWidth="12"
 					strokeDasharray={`${dash} ${circumference - dash}`}
 					strokeLinecap="round"

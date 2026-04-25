@@ -11,7 +11,6 @@ import {
 	Info,
 	LayoutDashboard,
 	MessageSquareMore,
-	Search,
 	Sparkles,
 	ShoppingBasket,
 	Users,
@@ -39,7 +38,6 @@ const adminLinks = [
 
 const userLinks = [
 	{ href: "/user/dashboard", label: "Dashboard", icon: LayoutDashboard },
-	{ href: "/user/discovery", label: "Tra cứu số", icon: Search },
 	{ href: "/user/books", label: "Danh s\u00e1ch s\u00e1ch", icon: BookOpen },
 	{ href: "/user/wishlist", label: "Gi\u1ecf m\u01b0\u1ee3n", icon: ShoppingBasket },
 	{ href: "/user/borrows", label: "Phi\u1ebfu m\u01b0\u1ee3n", icon: FileClock },
@@ -155,7 +153,7 @@ export function Sidebar({
 										"group flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition-all duration-200",
 										active
 											? "bg-primary text-primary-foreground shadow-sm"
-											: "text-muted-foreground hover:bg-muted hover:text-foreground",
+											: "text-muted-foreground hover:bg-primary/5 hover:text-primary",
 										collapsed && "lg:justify-center lg:px-2",
 									)}
 									title={collapsed ? item.label : undefined}

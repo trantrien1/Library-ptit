@@ -353,7 +353,7 @@ export default function SocialHubPage() {
 								);
 							})}
 							{loadingMorePosts ? (
-								<div className="rounded-2xl border border-slate-200 bg-white p-4 text-center text-sm text-slate-500">
+								<div className="rounded-2xl border border-slate-200 bg-white p-4 text-center text-sm text-slate-500 dark:border-white/10 dark:bg-slate-950/72 dark:text-slate-400">
 									Đang tải thêm bài viết...
 								</div>
 							) : null}
@@ -415,22 +415,22 @@ function SocialHeader({
 	onExplore: () => void;
 }) {
 	return (
-		<section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+		<section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-950/72 dark:shadow-[0_18px_40px_rgba(0,0,0,0.28)]">
 			<div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
 				<div className="max-w-3xl">
-					<div className="mb-3 inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-sm font-medium text-cyan-700">
+					<div className="mb-3 inline-flex items-center gap-2 rounded-full bg-cyan-50 px-3 py-1 text-sm font-medium text-cyan-700 dark:bg-cyan-500/12 dark:text-cyan-300">
 						<UsersRound className="h-4 w-4" />
 						Cộng đồng học tập thư viện số
 					</div>
-					<h1 className="text-3xl font-semibold tracking-tight text-slate-950 md:text-4xl">
+					<h1 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-50 md:text-4xl">
 						Library Social Hub
 					</h1>
-					<p className="mt-3 text-base leading-7 text-slate-600">
+					<p className="mt-3 text-base leading-7 text-slate-600 dark:text-slate-300">
 						Kết nối bạn đọc, chia sẻ tri thức và cùng nhau xây dựng thói quen đọc.
 					</p>
 				</div>
 				<div className="flex flex-col gap-3 sm:flex-row">
-					<Button className="gap-2 bg-cyan-600 text-white hover:bg-cyan-700" onClick={onCreatePost}>
+					<Button className="gap-2" onClick={onCreatePost}>
 						<Plus className="h-4 w-4" />
 						Tạo bài viết
 					</Button>
@@ -460,14 +460,14 @@ function SearchAndFilters({
 	onFilterChange: (value: string) => void;
 }) {
 	return (
-		<section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+		<section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-slate-950/72 dark:shadow-[0_18px_40px_rgba(0,0,0,0.24)]">
 			<div className="relative">
-				<Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+				<Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
 				<Input
 					value={query}
 					onChange={(event) => onQueryChange(event.target.value)}
 					placeholder="Tìm bài viết, nhóm thảo luận, review sách..."
-					className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-base"
+					className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-base text-slate-900 placeholder:text-slate-400 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-100 dark:placeholder:text-slate-500"
 				/>
 			</div>
 			<div className="mt-4 flex gap-2 overflow-x-auto pb-1">
@@ -478,8 +478,8 @@ function SearchAndFilters({
 						onClick={() => onFilterChange(filter)}
 						className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition ${
 							activeFilter === filter
-								? "border-cyan-600 bg-cyan-600 text-white shadow-sm"
-								: "border-slate-200 bg-white text-slate-600 hover:border-cyan-200 hover:bg-cyan-50 hover:text-cyan-700"
+								? "border-primary bg-primary text-primary-foreground shadow-sm"
+								: "border-slate-200 bg-white text-slate-600 hover:border-primary/30 hover:bg-primary/5 hover:text-primary dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-300 dark:hover:border-primary/30 dark:hover:bg-primary/10 dark:hover:text-primary"
 						}`}
 					>
 						{filter}
@@ -492,7 +492,7 @@ function SearchAndFilters({
 
 function FeedTabs({ value, onChange }: { value: string; onChange: (value: string) => void }) {
 	return (
-		<div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+		<div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm dark:border-white/10 dark:bg-slate-950/72">
 			<div className="flex gap-1 overflow-x-auto">
 				{feedTabs.map((tab) => (
 					<button
@@ -500,7 +500,7 @@ function FeedTabs({ value, onChange }: { value: string; onChange: (value: string
 						type="button"
 						onClick={() => onChange(tab.value)}
 						className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition ${
-							value === tab.value ? "bg-slate-950 text-white" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+							value === tab.value ? "bg-primary text-primary-foreground" : "text-slate-600 hover:bg-primary/5 hover:text-primary dark:text-slate-300 dark:hover:bg-primary/10 dark:hover:text-primary"
 						}`}
 					>
 						{tab.label}
@@ -530,9 +530,9 @@ function CommunitySidebar({
 		<aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
 			<SidebarCard icon={<ShieldCheck className="h-5 w-5 text-amber-600" />} title="Nhóm của tôi">
 				{managedGroups.length === 0 ? (
-					<div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-center">
-						<ShieldCheck className="mx-auto h-8 w-8 text-slate-400" />
-						<p className="mt-3 text-sm leading-6 text-slate-600">
+					<div className="rounded-xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] p-4 text-center">
+						<ShieldCheck className="mx-auto h-8 w-8 text-slate-400 dark:text-slate-500" />
+						<p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
 							Bạn chưa quản lý nhóm nào. Hãy tạo nhóm mới để bắt đầu xây dựng cộng đồng học tập.
 						</p>
 					</div>
@@ -552,13 +552,13 @@ function CommunitySidebar({
 				</div>
 			</SidebarCard>
 			<SidebarCard icon={<Flame className="h-5 w-5 text-rose-600" />} title="Bảng xếp hạng ngắn">
-				<p className="mb-3 text-xs leading-5 text-slate-500">
+				<p className="mb-3 text-xs leading-5 text-slate-500 dark:text-slate-400">
 					Thả tim +5 điểm, bình luận +10 điểm.
 				</p>
 				<div className="space-y-3">
 					{leaderboard.slice(0, 5).map((item, index) => (
 						<div key={item.user_id} className="flex items-center gap-3">
-							<div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-slate-600">
+							<div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 dark:bg-white/10 text-sm font-semibold text-slate-600 dark:text-slate-300">
 								{index + 1}
 							</div>
 							<Avatar className="h-9 w-9">
@@ -567,9 +567,9 @@ function CommunitySidebar({
 								</AvatarFallback>
 							</Avatar>
 							<div className="min-w-0 flex-1">
-								<p className="truncate font-medium text-slate-950">{item.full_name || item.username}</p>
-								<p className="text-xs text-slate-500">{item.community_points.toLocaleString("vi-VN")} điểm cộng đồng</p>
-								<p className="text-xs text-slate-400">
+								<p className="truncate font-medium text-slate-950 dark:text-slate-50">{item.full_name || item.username}</p>
+								<p className="text-xs text-slate-500 dark:text-slate-400">{item.community_points.toLocaleString("vi-VN")} điểm cộng đồng</p>
+								<p className="text-xs text-slate-400 dark:text-slate-500">
 									{(item.like_count || 0).toLocaleString("vi-VN")} tim · {item.comment_count.toLocaleString("vi-VN")} bình luận
 								</p>
 							</div>
@@ -589,16 +589,16 @@ function ManagedGroupCard({ group }: { group: DiscussionGroup }) {
 		>
 			<div className="flex items-start justify-between gap-3">
 				<div className="min-w-0">
-					<p className="truncate font-semibold text-slate-950">{group.name}</p>
-					<p className="mt-1 text-xs text-slate-600">
+					<p className="truncate font-semibold text-slate-950 dark:text-slate-50">{group.name}</p>
+					<p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
 						{(group.member_count || 0).toLocaleString("vi-VN")} thành viên · {(group.post_count || 0).toLocaleString("vi-VN")} bài viết
 					</p>
 				</div>
 				<Badge className="shrink-0 bg-amber-100 text-amber-800 hover:bg-amber-100">Quản lý</Badge>
 			</div>
 			<div className="mt-3 flex flex-wrap gap-2">
-				{group.topic ? <Badge variant="outline" className="border-amber-200 bg-white text-amber-800">{group.topic}</Badge> : null}
-				{group.requires_approval ? <Badge variant="outline" className="border-slate-200 bg-white text-slate-600">Cần duyệt</Badge> : null}
+				{group.topic ? <Badge variant="outline" className="border-amber-200 bg-white dark:bg-slate-950/80 text-amber-800 dark:text-amber-200">{group.topic}</Badge> : null}
+				{group.requires_approval ? <Badge variant="outline" className="border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/80 text-slate-600 dark:text-slate-300">Cần duyệt</Badge> : null}
 			</div>
 		</Link>
 	);
@@ -614,20 +614,20 @@ function GroupMiniCard({
 	onLeave: (group: DiscussionGroup) => void;
 }) {
 	return (
-		<div className="rounded-xl border border-slate-100 p-3 transition hover:border-cyan-200 hover:bg-cyan-50/40">
+		<div className="rounded-xl border border-slate-100 dark:border-white/10 p-3 transition hover:border-cyan-200 hover:bg-cyan-50/40 dark:hover:border-cyan-500/30 dark:hover:bg-cyan-500/8">
 			<div className="flex items-start justify-between gap-3">
 				<Link href={`/user/social/groups/${group.id}`} className="min-w-0 flex-1">
 					<div className="flex flex-wrap items-center gap-2">
-						<p className="font-semibold text-slate-950 hover:text-cyan-700">{group.name}</p>
+						<p className="font-semibold text-slate-950 dark:text-slate-50 hover:text-cyan-700 dark:hover:text-cyan-300">{group.name}</p>
 						{group.is_group_admin ? (
 							<Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Quản trị viên</Badge>
 						) : null}
 					</div>
-					<p className="mt-1 text-xs text-slate-500">{(group.member_count || 0).toLocaleString("vi-VN")} thành viên</p>
+					<p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{(group.member_count || 0).toLocaleString("vi-VN")} thành viên</p>
 				</Link>
 				<GroupActionButton group={group} onJoin={onJoin} onLeave={onLeave} />
 			</div>
-			<p className="mt-2 line-clamp-2 text-sm leading-5 text-slate-600">{group.description}</p>
+			<p className="mt-2 line-clamp-2 text-sm leading-5 text-slate-600 dark:text-slate-300">{group.description}</p>
 		</div>
 	);
 }
@@ -665,7 +665,7 @@ function GroupActionButton({
 		);
 	}
 	return (
-		<Button size="sm" className="h-8 gap-1 bg-cyan-600 text-white hover:bg-cyan-700" onClick={() => onJoin(group)}>
+		<Button size="sm" className="h-8 gap-1" onClick={() => onJoin(group)}>
 			<UserPlus className="h-3.5 w-3.5" />
 			Tham gia
 		</Button>
@@ -786,19 +786,19 @@ function PostCard({
 
 
 	return (
-		<article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+		<article className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:hover:bg-slate-950/80">
 			<div className="flex items-start gap-3">
 				<Avatar className="h-11 w-11">
 					<AvatarFallback className="bg-slate-900 text-sm font-semibold text-white">{getInitials(author)}</AvatarFallback>
 				</Avatar>
 				<div className="min-w-0 flex-1">
 					<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-						<p className="font-semibold text-slate-950">{author}</p>
-						<Badge variant="secondary" className="bg-slate-100 text-slate-600">
+						<p className="font-semibold text-slate-950 dark:text-slate-50">{author}</p>
+						<Badge variant="secondary" className="bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300">
 							{post.user?.role === "admin" ? "Quản trị viên" : "Sinh viên"}
 						</Badge>
 						<span className="text-sm text-slate-400">·</span>
-						<span className="text-sm text-slate-500">{formatRelativeTime(post.created_at)}</span>
+						<span className="text-sm text-slate-500 dark:text-slate-400">{formatRelativeTime(post.created_at)}</span>
 					</div>
 					<Link href={`/user/social/groups/${post.group_id}`} className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-cyan-700 hover:underline">
 						<UsersRound className="h-4 w-4" />
@@ -823,34 +823,34 @@ function PostCard({
 			</div>
 
 			<div className="mt-4">
-				<h2 className="text-xl font-semibold leading-7 text-slate-950">{post.title}</h2>
-				<p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">{post.content}</p>
+				<h2 className="text-xl font-semibold leading-7 text-slate-950 dark:text-slate-50">{post.title}</h2>
+				<p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600 dark:text-slate-300">{post.content}</p>
 			</div>
 
 			<div className="mt-4 flex flex-wrap gap-2">
-				<Badge variant="outline" className="border-cyan-100 bg-cyan-50 text-cyan-700">
+				<Badge variant="outline" className="border-cyan-100 bg-cyan-50 dark:border-cyan-500/30 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
 					{postTypeLabel(post.post_type)}
 				</Badge>
 				{splitTags(post.tags).map((tag) => (
-					<Badge key={tag} variant="outline" className="border-slate-200 bg-slate-50 text-slate-600">
+					<Badge key={tag} variant="outline" className="border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.05] text-slate-600 dark:text-slate-300">
 						{tag}
 					</Badge>
 				))}
 			</div>
 
-			<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-				<div className="flex items-center gap-4 text-sm text-slate-500">
+			<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-white/10 pt-4">
+				<div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
 					<span>{likeCount} lượt thích</span>
-					<button type="button" className="hover:text-slate-950" onClick={() => void loadComments()}>
+					<button type="button" className="hover:text-slate-950 dark:hover:text-slate-50" onClick={() => void loadComments()}>
 						{commentCount} bình luận
 					</button>
 				</div>
 				<div className="flex flex-wrap gap-1">
-					<Button variant="ghost" size="sm" disabled={busy === "like"} onClick={() => void toggleLike()} className={liked ? "gap-2 text-red-600 hover:text-red-700" : "gap-2 text-slate-600"}>
+					<Button variant="ghost" size="sm" disabled={busy === "like"} onClick={() => void toggleLike()} className={liked ? "gap-2 text-red-600 hover:text-red-700" : "gap-2 text-slate-600 dark:text-slate-300"}>
 						<Heart className={`h-4 w-4 ${liked ? "fill-red-600" : ""}`} />
 						Thích
 					</Button>
-					<Button variant="ghost" size="sm" className="gap-2 text-slate-600" onClick={() => void loadComments()}>
+					<Button variant="ghost" size="sm" className="gap-2 text-slate-600 dark:text-slate-300" onClick={() => void loadComments()}>
 						<MessageCircle className="h-4 w-4" />
 						Bình luận
 					</Button>
@@ -908,9 +908,9 @@ function CommentSection({
 	onSubmit: () => void;
 }) {
 	return (
-		<div className="mt-4 space-y-3 rounded-xl bg-slate-50 p-4">
+		<div className="mt-4 space-y-3 rounded-xl bg-slate-50 dark:bg-white/[0.04] p-4">
 			{comments.length === 0 ? (
-				<p className="text-sm text-slate-500">Chưa có bình luận nào. Hãy là người đầu tiên bình luận.</p>
+				<p className="text-sm text-slate-500 dark:text-slate-400">Chưa có bình luận nào. Hãy là người đầu tiên bình luận.</p>
 			) : (
 				comments.map((comment) => (
 					<div key={comment.id} className="flex gap-3">
@@ -919,14 +919,14 @@ function CommentSection({
 								{getInitials(comment.user?.full_name || comment.user?.username || "Bạn đọc")}
 							</AvatarFallback>
 						</Avatar>
-						<div className="min-w-0 rounded-xl bg-white px-3 py-2 shadow-sm">
+						<div className="min-w-0 rounded-xl bg-white dark:bg-slate-900/80 px-3 py-2 shadow-sm">
 							<div className="flex flex-wrap items-center gap-2">
-								<p className="text-sm font-semibold text-slate-950">
+								<p className="text-sm font-semibold text-slate-950 dark:text-slate-50">
 									{comment.user?.full_name || comment.user?.username || "Bạn đọc"}
 								</p>
 								<span className="text-xs text-slate-400">{formatRelativeTime(comment.created_at)}</span>
 							</div>
-							<p className="mt-1 text-sm leading-6 text-slate-600">{comment.content}</p>
+							<p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{comment.content}</p>
 						</div>
 					</div>
 				))
@@ -940,10 +940,10 @@ function CommentSection({
 						value={commentDraft}
 						onChange={(event) => onDraftChange(event.target.value)}
 						placeholder="Viết bình luận..."
-						className="min-h-16 resize-none rounded-xl border-slate-200 bg-white"
+						className="min-h-16 resize-none rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-500"
 					/>
 					<div className="mt-2 flex justify-end">
-						<Button size="sm" className="bg-cyan-600 text-white hover:bg-cyan-700" disabled={!commentDraft.trim() || busy} onClick={onSubmit}>
+						<Button size="sm" disabled={!commentDraft.trim() || busy} onClick={onSubmit}>
 							<Send className="mr-2 h-4 w-4" />
 							Gửi bình luận
 						</Button>
@@ -1031,7 +1031,7 @@ function PostFormDialog({
 						<Button variant="outline" onClick={onCancel}>
 							Hủy
 						</Button>
-						<Button className="bg-cyan-600 text-white hover:bg-cyan-700" disabled={submitting} onClick={onSubmit}>
+						<Button disabled={submitting} onClick={onSubmit}>
 							{submitLabel}
 						</Button>
 					</div>
@@ -1080,12 +1080,12 @@ function CreateGroupDialog({
 					<Field label="Quy định nhóm">
 						<Textarea value={form.rules} onChange={(event) => onFormChange({ ...form, rules: event.target.value })} className="min-h-20 resize-none" />
 					</Field>
-					<label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+					<label className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] p-3 text-sm text-slate-700 dark:text-slate-200">
 						<input
 							type="checkbox"
 							checked={form.requires_approval}
 							onChange={(event) => onFormChange({ ...form, requires_approval: event.target.checked })}
-							className="h-4 w-4 rounded border-slate-300"
+							className="h-4 w-4 rounded border-slate-300 dark:border-white/15 dark:bg-slate-900/70"
 						/>
 						Yêu cầu duyệt thành viên trước khi tham gia
 					</label>
@@ -1093,7 +1093,7 @@ function CreateGroupDialog({
 						<Button variant="outline" onClick={onCancel}>
 							Hủy
 						</Button>
-						<Button className="bg-cyan-600 text-white hover:bg-cyan-700" disabled={submitting} onClick={onSubmit}>
+						<Button disabled={submitting} onClick={onSubmit}>
 							Tạo nhóm
 						</Button>
 					</div>
@@ -1125,15 +1125,15 @@ function ExploreGroupsDialog({
 				</DialogHeader>
 				<div className="space-y-3">
 					{groups.map((group) => (
-						<div key={group.id} className="flex flex-col gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-cyan-200 hover:bg-cyan-50/40 sm:flex-row sm:items-start sm:justify-between">
+						<div key={group.id} className="flex flex-col gap-3 rounded-xl border border-slate-200 dark:border-white/10 p-4 transition hover:border-cyan-200 hover:bg-cyan-50/40 dark:hover:border-cyan-500/30 dark:hover:bg-cyan-500/8 sm:flex-row sm:items-start sm:justify-between">
 							<Link href={`/user/social/groups/${group.id}`} className="min-w-0 flex-1">
 								<div className="flex flex-wrap items-center gap-2">
-									<p className="font-semibold text-slate-950 hover:text-cyan-700">{group.name}</p>
+									<p className="font-semibold text-slate-950 hover:text-cyan-700 dark:text-slate-50 dark:hover:text-cyan-300">{group.name}</p>
 									{group.requires_approval ? <Badge variant="outline">Cần duyệt</Badge> : null}
 									{group.is_group_admin ? <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Quản trị viên</Badge> : null}
 								</div>
-								<p className="mt-1 text-xs text-slate-500">{(group.member_count || 0).toLocaleString("vi-VN")} thành viên</p>
-								<p className="mt-2 text-sm leading-6 text-slate-600">{group.description}</p>
+								<p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{(group.member_count || 0).toLocaleString("vi-VN")} thành viên</p>
+								<p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{group.description}</p>
 							</Link>
 							<GroupActionButton group={group} onJoin={onJoin} onLeave={onLeave} />
 						</div>
@@ -1196,15 +1196,15 @@ function SidebarCard({
 	children: ReactNode;
 }) {
 	return (
-		<Card className="rounded-2xl border-slate-200 shadow-sm">
+		<Card className="rounded-2xl border-slate-200 dark:border-white/10 shadow-sm dark:bg-slate-950/72">
 			<CardContent className="p-4">
 				<div className="mb-4 flex items-center justify-between gap-3">
 					<div className="flex items-center gap-2">
 						{icon}
-						<h3 className="font-semibold text-slate-950">{title}</h3>
+						<h3 className="font-semibold text-slate-950 dark:text-slate-50">{title}</h3>
 					</div>
 					{action ? (
-						<button type="button" onClick={onAction} className="text-sm font-medium text-cyan-700 hover:text-cyan-800">
+						<button type="button" onClick={onAction} className="text-sm font-medium text-cyan-700 hover:text-cyan-800 dark:text-cyan-300 dark:hover:text-cyan-200">
 							{action}
 						</button>
 					) : null}
@@ -1218,7 +1218,7 @@ function SidebarCard({
 function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
 	return (
 		<div className="space-y-2">
-			<label className="text-sm font-medium text-slate-700">{label}</label>
+			<label className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</label>
 			{children}
 			{error ? <p className="text-sm text-red-600">{error}</p> : null}
 		</div>
@@ -1227,11 +1227,11 @@ function Field({ label, error, children }: { label: string; error?: string; chil
 
 function EmptyFeed({ onCreate }: { onCreate: () => void }) {
 	return (
-		<div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
-			<MessageCircle className="mx-auto h-10 w-10 text-slate-400" />
-			<p className="mt-4 font-semibold text-slate-950">Chưa có bài viết phù hợp</p>
-			<p className="mt-2 text-sm text-slate-500">Hãy bắt đầu một cuộc thảo luận mới cho cộng đồng.</p>
-			<Button className="mt-4 bg-cyan-600 text-white hover:bg-cyan-700" onClick={onCreate}>
+		<div className="rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-10 text-center">
+			<MessageCircle className="mx-auto h-10 w-10 text-slate-400 dark:text-slate-500" />
+			<p className="mt-4 font-semibold text-slate-950 dark:text-slate-50">Chưa có bài viết phù hợp</p>
+			<p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Hãy bắt đầu một cuộc thảo luận mới cho cộng đồng.</p>
+			<Button className="mt-4" onClick={onCreate}>
 				Tạo bài viết
 			</Button>
 		</div>

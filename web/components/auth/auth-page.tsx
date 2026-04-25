@@ -59,6 +59,14 @@ const modeConfig = {
 	},
 } satisfies Record<AuthMode, Record<string, string>>;
 
+const authLabelClassName = "text-sm font-medium text-slate-700 dark:text-slate-200";
+const authIconClassName =
+	"pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500";
+const authInputClassName =
+	"auth-input h-12 rounded-2xl border-slate-200/80 bg-white/85 text-slate-950 placeholder:text-slate-400 shadow-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-0 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-50 dark:placeholder:text-slate-500";
+const authToggleButtonClassName =
+	"absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-slate-100";
+
 function getBrowserStorage() {
 	if (typeof window === "undefined") return null;
 	const storage = window.localStorage;
@@ -84,14 +92,14 @@ function PasswordInput({
 	const [visible, setVisible] = useState(false);
 	return (
 		<div className="relative">
-			<KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+			<KeyRound className={authIconClassName} />
 			<Input
 				id={id}
 				type={visible ? "text" : "password"}
 				value={value}
 				onChange={(event) => onChange(event.target.value)}
 				placeholder={placeholder}
-				className="h-12 rounded-2xl border-slate-200 bg-white/80 pl-10 pr-11 shadow-sm transition focus-visible:ring-2"
+				className={cn(authInputClassName, "pl-10 pr-11")}
 				style={{ "--tw-ring-color": accent } as React.CSSProperties}
 				required={required}
 				minLength={6}
@@ -99,7 +107,7 @@ function PasswordInput({
 			<button
 				type="button"
 				onClick={() => setVisible((current) => !current)}
-				className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+				className={authToggleButtonClassName}
 				aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
 			>
 				{visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -125,12 +133,12 @@ function PasswordStrength({ password, accent }: { password: string; accent: stri
 				{Array.from({ length: 5 }).map((_, index) => (
 					<div
 						key={index}
-						className="h-1.5 flex-1 rounded-full bg-slate-200 transition-all duration-300"
+						className="h-1.5 flex-1 rounded-full bg-slate-200 transition-all duration-300 dark:bg-white/10"
 						style={{ backgroundColor: index < score ? accent : undefined }}
 					/>
 				))}
 			</div>
-			<p className="text-xs text-slate-500">Độ mạnh mật khẩu: {label}</p>
+			<p className="text-xs text-slate-500 dark:text-slate-400">Độ mạnh mật khẩu: {label}</p>
 		</div>
 	);
 }
@@ -158,18 +166,18 @@ function AuthInput({
 }) {
 	return (
 		<div className="space-y-2">
-			<Label htmlFor={id} className="text-sm font-medium text-slate-700">
+			<Label htmlFor={id} className={authLabelClassName}>
 				{label}
 			</Label>
 			<div className="relative">
-				<Icon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+				<Icon className={authIconClassName} />
 				<Input
 					id={id}
 					type={type}
 					value={value}
 					onChange={(event) => onChange(event.target.value)}
 					placeholder={placeholder}
-					className="h-12 rounded-2xl border-slate-200 bg-white/80 pl-10 shadow-sm transition focus-visible:ring-2"
+					className={cn(authInputClassName, "pl-10")}
 					style={{ "--tw-ring-color": accent } as React.CSSProperties}
 					required={required}
 				/>
@@ -178,7 +186,7 @@ function AuthInput({
 	);
 }
 
-function AnimatedBackground({ mode }: { mode: AuthMode }) {
+export function AnimatedBackground({ mode }: { mode: AuthMode }) {
 	const config = modeConfig[mode];
 	return (
 		<div className="absolute inset-0 overflow-hidden">
@@ -218,16 +226,16 @@ function AnimatedBackground({ mode }: { mode: AuthMode }) {
 	);
 }
 
-function AuthHero({ mode }: { mode: AuthMode }) {
+export function AuthHero({ mode }: { mode: AuthMode }) {
 	const features = [
 		{ title: "Tra cứu tài liệu số", icon: BookOpen, text: "Sách, ebook, luận văn và tài nguyên học thuật." },
 		{ title: "Chatbot AI học tập", icon: Bot, text: "Hỏi đáp, tóm tắt, quiz và flashcard thông minh." },
 		{ title: "Cộng đồng học tập", icon: UsersRound, text: "Thảo luận nhóm, review sách và chia sẻ tài liệu." },
 		{ title: "Sự kiện & Lab sáng tạo", icon: FlaskConical, text: "Đăng ký workshop, tutorial và đặt lịch thiết bị." },
 	];
+
 	return (
 		<section className="relative hidden min-h-screen overflow-hidden lg:flex lg:items-center">
-			<AnimatedBackground mode={mode} />
 			<div className="relative z-10 max-w-2xl px-12 py-12 text-white xl:px-16">
 				<div className="inline-flex items-center gap-3 rounded-full border border-white/25 bg-white/15 px-4 py-2 text-sm shadow-lg backdrop-blur-xl">
 					<div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-slate-950">
@@ -282,13 +290,13 @@ function AuthHero({ mode }: { mode: AuthMode }) {
 function AuthTabs({ mode, onModeChange }: { mode: AuthMode; onModeChange: (mode: AuthMode) => void }) {
 	const activeClass = modeConfig[mode].tabClass;
 	return (
-		<div className="relative grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+		<div className="relative grid grid-cols-2 rounded-2xl bg-slate-100/90 p-1 dark:bg-white/5">
 			<button
 				type="button"
 				onClick={() => onModeChange("login")}
 				className={cn(
 					"relative z-10 rounded-xl px-4 py-2.5 text-center text-sm font-semibold transition-all duration-300",
-					mode === "login" ? activeClass : "text-slate-500 hover:text-slate-900",
+					mode === "login" ? activeClass : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100",
 				)}
 			>
 				Đăng nhập
@@ -298,7 +306,7 @@ function AuthTabs({ mode, onModeChange }: { mode: AuthMode; onModeChange: (mode:
 				onClick={() => onModeChange("register")}
 				className={cn(
 					"relative z-10 rounded-xl px-4 py-2.5 text-center text-sm font-semibold transition-all duration-300",
-					mode === "register" ? activeClass : "text-slate-500 hover:text-slate-900",
+					mode === "register" ? activeClass : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100",
 				)}
 			>
 				Đăng ký
@@ -345,16 +353,16 @@ function LoginForm({ accent }: { accent: string }) {
 				accent={accent}
 			/>
 			<div className="space-y-2">
-				<Label htmlFor="password" className="text-sm font-medium text-slate-700">Mật khẩu</Label>
+				<Label htmlFor="password" className={authLabelClassName}>Mật khẩu</Label>
 				<PasswordInput id="password" value={password} onChange={setPassword} placeholder="Nhập mật khẩu" accent={accent} />
 			</div>
 			<div className="flex items-center justify-between gap-3 text-sm">
-				<label className="flex cursor-pointer items-center gap-2 text-slate-600">
+				<label className="flex cursor-pointer items-center gap-2 text-slate-600 dark:text-slate-300">
 					<input
 						type="checkbox"
 						checked={remember}
 						onChange={(event) => setRemember(event.target.checked)}
-						className="h-4 w-4 rounded border-slate-300"
+						className="h-4 w-4 rounded border-slate-300 dark:border-white/15 dark:bg-slate-900/70"
 						style={{ accentColor: accent }}
 					/>
 					Ghi nhớ đăng nhập
@@ -439,27 +447,27 @@ function RegisterForm({ accent }: { accent: string }) {
 			</div>
 			<div className="grid gap-4 sm:grid-cols-2">
 				<div className="space-y-2">
-					<Label htmlFor="reg-password" className="text-sm font-medium text-slate-700">Mật khẩu</Label>
+					<Label htmlFor="reg-password" className={authLabelClassName}>Mật khẩu</Label>
 					<PasswordInput id="reg-password" value={form.password} onChange={(value) => setField("password", value)} placeholder="Ít nhất 6 ký tự" accent={accent} />
 				</div>
 				<div className="space-y-2">
-					<Label htmlFor="confirm-password" className="text-sm font-medium text-slate-700">Xác nhận mật khẩu</Label>
+					<Label htmlFor="confirm-password" className={authLabelClassName}>Xác nhận mật khẩu</Label>
 					<div className="relative">
-						<LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+						<LockKeyhole className={authIconClassName} />
 						<Input
 							id="confirm-password"
 							type={showConfirm ? "text" : "password"}
 							value={form.confirmPassword}
 							onChange={(event) => setField("confirmPassword", event.target.value)}
 							placeholder="Nhập lại mật khẩu"
-							className="h-12 rounded-2xl border-slate-200 bg-white/80 pl-10 pr-11 shadow-sm transition focus-visible:ring-2"
+							className={cn(authInputClassName, "pl-10 pr-11")}
 							style={{ "--tw-ring-color": accent } as React.CSSProperties}
 							required
 						/>
 						<button
 							type="button"
 							onClick={() => setShowConfirm((current) => !current)}
-							className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+							className={authToggleButtonClassName}
 						>
 							{showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
 						</button>
@@ -467,12 +475,12 @@ function RegisterForm({ accent }: { accent: string }) {
 				</div>
 			</div>
 			<PasswordStrength password={form.password} accent={accent} />
-			<label className="flex cursor-pointer items-start gap-2 text-sm leading-6 text-slate-600">
+			<label className="flex cursor-pointer items-start gap-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
 				<input
 					type="checkbox"
 					checked={accepted}
 					onChange={(event) => setAccepted(event.target.checked)}
-					className="mt-1 h-4 w-4 rounded border-slate-300"
+					className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-white/15 dark:bg-slate-900/70"
 					style={{ accentColor: accent }}
 				/>
 				Tôi đồng ý với điều khoản sử dụng thư viện số và chính sách bảo vệ dữ liệu học tập.
@@ -508,9 +516,14 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 	};
 
 	return (
-		<div className="min-h-screen overflow-hidden bg-slate-950 lg:grid lg:grid-cols-[55fr_45fr]">
-			<AuthHero mode={activeMode} />
-			<main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-8 sm:px-6 lg:px-10">
+		<div className="relative min-h-screen overflow-hidden bg-slate-950 lg:grid lg:grid-cols-[55fr_45fr]">
+			<div className="absolute inset-0 hidden lg:block">
+				<AnimatedBackground mode={activeMode} />
+			</div>
+			<div className="relative z-10">
+				<AuthHero mode={activeMode} />
+			</div>
+			<main className="relative z-10 flex min-h-screen items-center justify-center overflow-hidden bg-transparent px-4 py-8 sm:px-6 lg:px-10">
 				<div
 					className={cn(
 						"absolute inset-0 bg-cover bg-center transition-opacity duration-500 lg:hidden",
@@ -525,7 +538,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 					)}
 					style={{ backgroundImage: "url(/Background2.png)" }}
 				/>
-				<div className="absolute inset-0 bg-white/72 lg:bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.92),transparent_32%),linear-gradient(135deg,rgba(248,250,252,0.96),rgba(255,255,255,0.82))]" />
+				<div className="absolute inset-0 bg-white/72 dark:bg-slate-950/82 lg:hidden" />
 				<div
 					className="absolute right-10 top-16 h-52 w-52 rounded-full blur-3xl transition duration-500"
 					style={{ backgroundColor: config.accentSoft }}
@@ -535,7 +548,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 					style={{ backgroundColor: activeMode === "login" ? "rgba(244,63,94,0.12)" : "rgba(14,165,233,0.13)" }}
 				/>
 				<div className="relative z-10 w-full max-w-xl">
-					<div className="auth-panel-enter rounded-[2rem] border border-white/80 bg-white/78 p-5 shadow-[0_28px_90px_rgba(15,23,42,0.18)] backdrop-blur-2xl sm:p-7">
+					<div className="auth-panel-enter rounded-[2rem] border border-white/80 bg-white/78 p-5 shadow-[0_28px_90px_rgba(15,23,42,0.18)] backdrop-blur-2xl dark:border-white/10 dark:bg-slate-950/72 dark:shadow-[0_28px_90px_rgba(0,0,0,0.45)] sm:p-7">
 						<div className="mb-6">
 							<AuthTabs mode={activeMode} onModeChange={switchMode} />
 						</div>
@@ -547,12 +560,12 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 								{activeMode === "login" ? <KeyRound className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
 							</div>
 							<div>
-								<h2 className="text-3xl font-semibold tracking-normal text-slate-950">{config.title}</h2>
-								<p className="mt-2 text-sm leading-6 text-slate-500">{config.description}</p>
+								<h2 className="text-3xl font-semibold tracking-normal text-slate-950 dark:text-slate-50">{config.title}</h2>
+								<p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">{config.description}</p>
 							</div>
 						</div>
 						{activeMode === "login" ? <LoginForm accent={config.accent} /> : <RegisterForm accent={config.accent} />}
-						<div className="mt-6 text-center text-sm text-slate-500">
+						<div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
 							{activeMode === "login" ? (
 								<>
 									Chưa có tài khoản?{" "}
@@ -570,7 +583,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 							)}
 						</div>
 					</div>
-					<div className="mt-5 flex items-center justify-center gap-2 text-xs text-slate-500">
+					<div className="mt-5 flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
 						<CheckCircle2 className="h-4 w-4" />
 						Bảo mật phiên đăng nhập và đồng bộ với Library PTIT API
 					</div>

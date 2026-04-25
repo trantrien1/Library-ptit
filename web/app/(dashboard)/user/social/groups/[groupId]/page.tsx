@@ -236,7 +236,7 @@ export default function SocialGroupPage() {
 	};
 
 	if (!group) {
-		return <div className="rounded-2xl border bg-white p-6 text-sm text-slate-500">Đang tải nhóm...</div>;
+		return <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-6 text-sm text-slate-500 dark:text-slate-400">Đang tải nhóm...</div>;
 	}
 
 	return (
@@ -249,7 +249,7 @@ export default function SocialGroupPage() {
 				onDelete={() => setDeleteGroupOpen(true)}
 			/>
 
-			<div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+			<div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-2 shadow-sm">
 				<div className="flex gap-1 overflow-x-auto">
 					{tabs.map((tab) => (
 						<button
@@ -257,7 +257,7 @@ export default function SocialGroupPage() {
 							type="button"
 							onClick={() => setActiveTab(tab.value)}
 							className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition ${
-								activeTab === tab.value ? "bg-slate-950 text-white" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+								activeTab === tab.value ? "bg-primary text-primary-foreground" : "text-slate-600 dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary dark:hover:text-primary"
 							}`}
 						>
 							{tab.label}
@@ -268,7 +268,7 @@ export default function SocialGroupPage() {
 
 			{activeTab === "posts" ? (
 				<section className="space-y-4">
-					<div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+					<div className="flex flex-col gap-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
 						<div className="flex gap-1 overflow-x-auto">
 							{sortTabs.map((tab) => (
 								<button
@@ -276,27 +276,27 @@ export default function SocialGroupPage() {
 									type="button"
 									onClick={() => setSort(tab.value)}
 									className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition ${
-										sort === tab.value ? "bg-cyan-600 text-white" : "text-slate-600 hover:bg-slate-100"
+										sort === tab.value ? "bg-primary text-primary-foreground" : "text-slate-600 dark:text-slate-300 hover:bg-primary/5 dark:hover:bg-primary/10 hover:text-primary dark:hover:text-primary"
 									}`}
 								>
 									{tab.label}
 								</button>
 							))}
 						</div>
-						<Button className="gap-2 bg-slate-950 text-white hover:bg-slate-800" onClick={openCreate}>
+						<Button className="gap-2" onClick={openCreate}>
 							<Plus className="h-4 w-4" />
 							Tạo bài viết trong nhóm
 						</Button>
 					</div>
 					{!group.is_member && group.group_role !== "admin" ? (
-						<div className="rounded-2xl border border-dashed border-slate-200 bg-white p-8 text-center text-sm text-slate-600">
+						<div className="rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-8 text-center text-sm text-slate-600 dark:text-slate-300">
 							Bạn cần tham gia nhóm để đăng bài.
 						</div>
 					) : null}
 					{posts.length === 0 ? (
-						<div className="rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
-							<p className="font-semibold text-slate-950">Nhóm chưa có bài viết</p>
-							<p className="mt-2 text-sm text-slate-500">Hãy là người đầu tiên mở cuộc thảo luận.</p>
+						<div className="rounded-2xl border border-dashed border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-10 text-center">
+							<p className="font-semibold text-slate-950 dark:text-slate-50">Nhóm chưa có bài viết</p>
+							<p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Hãy là người đầu tiên mở cuộc thảo luận.</p>
 						</div>
 					) : (
 						posts.map((post) => (
@@ -365,7 +365,7 @@ function GroupHeader({
 	onDelete: () => void;
 }) {
 	return (
-		<Card className="rounded-3xl border-slate-200 shadow-sm">
+		<Card className="rounded-3xl border-slate-200 dark:border-white/10 shadow-sm dark:bg-slate-950/72">
 			<CardContent className="p-6">
 				<Link href="/user/social" className="text-sm font-medium text-cyan-700 hover:underline">
 					Quay lại Social Hub
@@ -378,7 +378,7 @@ function GroupHeader({
 							</Avatar>
 							<div>
 								<div className="flex flex-wrap items-center gap-2">
-									<h1 className="text-3xl font-semibold tracking-tight text-slate-950">{group.name}</h1>
+									<h1 className="text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-50">{group.name}</h1>
 									{group.is_group_admin ? (
 										<Badge className="gap-1 bg-amber-100 text-amber-800 hover:bg-amber-100">
 											<ShieldCheck className="h-3.5 w-3.5" />
@@ -386,12 +386,12 @@ function GroupHeader({
 										</Badge>
 									) : null}
 								</div>
-								<p className="mt-1 text-sm text-slate-500">
+								<p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
 									{(group.member_count || 0).toLocaleString("vi-VN")} thành viên · {(group.post_count || 0).toLocaleString("vi-VN")} bài viết
 								</p>
 							</div>
 						</div>
-						<p className="mt-4 max-w-3xl leading-7 text-slate-600">{group.description}</p>
+						<p className="mt-4 max-w-3xl leading-7 text-slate-600 dark:text-slate-300">{group.description}</p>
 						<div className="mt-3 flex flex-wrap gap-2">
 							{group.topic ? <Badge variant="outline">{group.topic}</Badge> : null}
 							{group.requires_approval ? <Badge variant="outline">Cần duyệt thành viên</Badge> : null}
@@ -399,7 +399,7 @@ function GroupHeader({
 					</div>
 					<div className="flex flex-col gap-2 sm:flex-row">
 						<GroupAction group={group} onJoin={onJoin} onLeave={onLeave} onDelete={onDelete} />
-						<Button className="gap-2 bg-slate-950 text-white hover:bg-slate-800" onClick={onCreate}>
+						<Button className="gap-2" onClick={onCreate}>
 							<Plus className="h-4 w-4" />
 							Tạo bài viết
 						</Button>
@@ -460,7 +460,7 @@ function GroupAction({
 		);
 	}
 	return (
-		<Button className="gap-2 bg-cyan-600 text-white hover:bg-cyan-700" onClick={onJoin}>
+		<Button className="gap-2" onClick={onJoin}>
 			<UserPlus className="h-4 w-4" />
 			Tham gia
 		</Button>
@@ -469,8 +469,8 @@ function GroupAction({
 
 function MemberList({ members }: { members: DiscussionGroupMember[] }) {
 	return (
-		<section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-			<h2 className="font-semibold text-slate-950">Thành viên đã duyệt</h2>
+		<section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-5 shadow-sm">
+			<h2 className="font-semibold text-slate-950 dark:text-slate-50">Thành viên đã duyệt</h2>
 			<div className="mt-4 grid gap-3 sm:grid-cols-2">
 				{members.map((member) => (
 					<MemberRow key={member.id} member={member} />
@@ -492,19 +492,19 @@ function PendingRequests({
 	onReject: (member: DiscussionGroupMember) => void;
 }) {
 	return (
-		<section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-			<h2 className="font-semibold text-slate-950">Yêu cầu tham gia</h2>
+		<section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-5 shadow-sm">
+			<h2 className="font-semibold text-slate-950 dark:text-slate-50">Yêu cầu tham gia</h2>
 			{members.length === 0 ? (
-				<p className="mt-3 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-500">
+				<p className="mt-3 rounded-xl border border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] p-6 text-center text-sm text-slate-500 dark:text-slate-400">
 					Chưa có yêu cầu tham gia nào.
 				</p>
 			) : (
 				<div className="mt-4 space-y-3">
 					{members.map((member) => (
-						<div key={member.id} className="flex flex-col gap-3 rounded-xl border border-slate-100 p-3 sm:flex-row sm:items-center sm:justify-between">
+						<div key={member.id} className="flex flex-col gap-3 rounded-xl border border-slate-100 dark:border-white/10 p-3 sm:flex-row sm:items-center sm:justify-between">
 							<MemberIdentity member={member} />
 							<div className="flex gap-2">
-								<Button size="sm" className="gap-2 bg-cyan-600 text-white hover:bg-cyan-700" disabled={busy === `approve-${member.user_id}`} onClick={() => onApprove(member)}>
+								<Button size="sm" className="gap-2" disabled={busy === `approve-${member.user_id}`} onClick={() => onApprove(member)}>
 									<Check className="h-4 w-4" />
 									Duyệt
 								</Button>
@@ -524,9 +524,9 @@ function PendingRequests({
 function AboutGroup({ group, members }: { group: DiscussionGroup; members: DiscussionGroupMember[] }) {
 	const owner = members.find((member) => member.role === "admin" || member.role === "owner");
 	return (
-		<section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-			<h2 className="font-semibold text-slate-950">Giới thiệu nhóm</h2>
-			<div className="mt-4 space-y-4 text-sm leading-6 text-slate-600">
+		<section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-5 shadow-sm">
+			<h2 className="font-semibold text-slate-950 dark:text-slate-50">Giới thiệu nhóm</h2>
+			<div className="mt-4 space-y-4 text-sm leading-6 text-slate-600 dark:text-slate-300">
 				<p>{group.description}</p>
 				<div className="grid gap-3 sm:grid-cols-2">
 					<InfoBlock label="Ngày tạo" value={new Date(group.created_at).toLocaleDateString("vi-VN")} />
@@ -534,8 +534,8 @@ function AboutGroup({ group, members }: { group: DiscussionGroup; members: Discu
 					<InfoBlock label="Chủ đề" value={group.topic || "Chưa đặt chủ đề"} />
 					<InfoBlock label="Cơ chế tham gia" value={group.requires_approval ? "Cần quản trị viên duyệt" : "Tham gia ngay"} />
 				</div>
-				<div className="rounded-xl bg-slate-50 p-4">
-					<p className="font-medium text-slate-950">Quy định nhóm</p>
+				<div className="rounded-xl bg-slate-50 dark:bg-white/[0.04] p-4">
+					<p className="font-medium text-slate-950 dark:text-slate-50">Quy định nhóm</p>
 					<p className="mt-2">{group.rules || "Tôn trọng người khác, chia sẻ đúng chủ đề và ưu tiên nguồn tài liệu đáng tin cậy."}</p>
 				</div>
 			</div>
@@ -545,16 +545,16 @@ function AboutGroup({ group, members }: { group: DiscussionGroup; members: Discu
 
 function InfoBlock({ label, value }: { label: string; value: string }) {
 	return (
-		<div className="rounded-xl border border-slate-100 p-3">
-			<p className="text-xs font-medium uppercase text-slate-400">{label}</p>
-			<p className="mt-1 font-medium text-slate-800">{value}</p>
+		<div className="rounded-xl border border-slate-100 dark:border-white/10 p-3">
+			<p className="text-xs font-medium uppercase text-slate-400 dark:text-slate-500">{label}</p>
+			<p className="mt-1 font-medium text-slate-800 dark:text-slate-200">{value}</p>
 		</div>
 	);
 }
 
 function MemberRow({ member }: { member: DiscussionGroupMember }) {
 	return (
-		<div className="rounded-xl border border-slate-100 p-3">
+		<div className="rounded-xl border border-slate-100 dark:border-white/10 p-3">
 			<MemberIdentity member={member} />
 		</div>
 	);
@@ -568,8 +568,8 @@ function MemberIdentity({ member }: { member: DiscussionGroupMember }) {
 				<AvatarFallback className="bg-cyan-100 text-sm font-semibold text-cyan-700">{getInitials(name)}</AvatarFallback>
 			</Avatar>
 			<div>
-				<p className="font-medium text-slate-950">{name}</p>
-				<p className="text-xs text-slate-500">
+				<p className="font-medium text-slate-950 dark:text-slate-50">{name}</p>
+				<p className="text-xs text-slate-500 dark:text-slate-400">
 					{member.role === "admin" || member.role === "owner" ? "Quản trị viên" : "Thành viên"} · {formatRelativeTime(member.joined_at)}
 				</p>
 			</div>
@@ -690,19 +690,19 @@ function PostCard({
 	};
 
 	return (
-		<article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+		<article className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/72 p-5 shadow-sm">
 			<div className="flex items-start gap-3">
 				<Avatar className="h-11 w-11">
 					<AvatarFallback className="bg-slate-900 text-sm font-semibold text-white">{getInitials(author)}</AvatarFallback>
 				</Avatar>
 				<div className="min-w-0 flex-1">
 					<div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-						<p className="font-semibold text-slate-950">{author}</p>
-						<Badge variant="secondary" className="bg-slate-100 text-slate-600">
+						<p className="font-semibold text-slate-950 dark:text-slate-50">{author}</p>
+						<Badge variant="secondary" className="bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300">
 							{post.user?.role === "admin" ? "Quản trị viên" : "Sinh viên"}
 						</Badge>
 						<span className="text-sm text-slate-400">·</span>
-						<span className="text-sm text-slate-500">{formatRelativeTime(post.created_at)}</span>
+						<span className="text-sm text-slate-500 dark:text-slate-400">{formatRelativeTime(post.created_at)}</span>
 					</div>
 					<p className="mt-1 inline-flex items-center gap-2 text-sm font-medium text-cyan-700">
 						<UsersRound className="h-4 w-4" />
@@ -727,23 +727,23 @@ function PostCard({
 			</div>
 
 			<div className="mt-4">
-				<h2 className="text-xl font-semibold leading-7 text-slate-950">{post.title}</h2>
-				<p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">{post.content}</p>
+				<h2 className="text-xl font-semibold leading-7 text-slate-950 dark:text-slate-50">{post.title}</h2>
+				<p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600 dark:text-slate-300">{post.content}</p>
 			</div>
 			<div className="mt-4 flex flex-wrap gap-2">
-				<Badge variant="outline" className="border-cyan-100 bg-cyan-50 text-cyan-700">{postTypeLabel(post.post_type)}</Badge>
+				<Badge variant="outline" className="border-cyan-100 bg-cyan-50 dark:border-cyan-500/30 dark:bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">{postTypeLabel(post.post_type)}</Badge>
 				{splitTags(post.tags).map((tag) => <Badge key={tag} variant="outline">{tag}</Badge>)}
 			</div>
-			<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-				<div className="flex items-center gap-4 text-sm text-slate-500">
+			<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-white/10 pt-4">
+				<div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
 					<span>{likeCount} lượt thích</span>
-					<button type="button" className="hover:text-slate-950" onClick={() => void loadComments()}>{commentCount} bình luận</button>
+					<button type="button" className="hover:text-slate-950 dark:hover:text-slate-50" onClick={() => void loadComments()}>{commentCount} bình luận</button>
 				</div>
 				<div className="flex flex-wrap gap-1">
-					<Button variant="ghost" size="sm" disabled={busy === "like"} onClick={() => void toggleLike()} className={liked ? "gap-2 text-red-600 hover:text-red-700" : "gap-2 text-slate-600"}>
+					<Button variant="ghost" size="sm" disabled={busy === "like"} onClick={() => void toggleLike()} className={liked ? "gap-2 text-red-600 hover:text-red-700" : "gap-2 text-slate-600 dark:text-slate-300"}>
 						<Heart className={`h-4 w-4 ${liked ? "fill-red-600" : ""}`} /> Thích
 					</Button>
-					<Button variant="ghost" size="sm" className="gap-2 text-slate-600" onClick={() => void loadComments()}>
+					<Button variant="ghost" size="sm" className="gap-2 text-slate-600 dark:text-slate-300" onClick={() => void loadComments()}>
 						<MessageCircle className="h-4 w-4" /> Bình luận
 					</Button>
 				</div>
@@ -771,18 +771,18 @@ function CommentSection({
 	onSubmit: () => void;
 }) {
 	return (
-		<div className="mt-4 space-y-3 rounded-xl bg-slate-50 p-4">
+		<div className="mt-4 space-y-3 rounded-xl bg-slate-50 dark:bg-white/[0.04] p-4">
 			{comments.length === 0 ? (
-				<p className="text-sm text-slate-500">Chưa có bình luận nào. Hãy là người đầu tiên bình luận.</p>
+				<p className="text-sm text-slate-500 dark:text-slate-400">Chưa có bình luận nào. Hãy là người đầu tiên bình luận.</p>
 			) : (
 				comments.map((comment) => (
 					<div key={comment.id} className="flex gap-3">
 						<Avatar className="h-8 w-8">
 							<AvatarFallback className="bg-cyan-100 text-xs font-semibold text-cyan-700">{getInitials(comment.user?.full_name || comment.user?.username || "Bạn đọc")}</AvatarFallback>
 						</Avatar>
-						<div className="min-w-0 rounded-xl bg-white px-3 py-2 shadow-sm">
-							<p className="text-sm font-semibold text-slate-950">{comment.user?.full_name || comment.user?.username || "Bạn đọc"}</p>
-							<p className="mt-1 text-sm leading-6 text-slate-600">{comment.content}</p>
+						<div className="min-w-0 rounded-xl bg-white dark:bg-slate-900/80 px-3 py-2 shadow-sm">
+							<p className="text-sm font-semibold text-slate-950 dark:text-slate-50">{comment.user?.full_name || comment.user?.username || "Bạn đọc"}</p>
+							<p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{comment.content}</p>
 						</div>
 					</div>
 				))
@@ -790,9 +790,9 @@ function CommentSection({
 			<div className="flex gap-3 pt-2">
 				<Avatar className="h-9 w-9"><AvatarFallback className="bg-cyan-100 text-xs font-semibold text-cyan-700">PT</AvatarFallback></Avatar>
 				<div className="min-w-0 flex-1">
-					<Textarea value={commentDraft} onChange={(event) => onDraftChange(event.target.value)} placeholder="Viết bình luận..." className="min-h-16 resize-none rounded-xl border-slate-200 bg-white" />
+					<Textarea value={commentDraft} onChange={(event) => onDraftChange(event.target.value)} placeholder="Viết bình luận..." className="min-h-16 resize-none rounded-xl border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-500" />
 					<div className="mt-2 flex justify-end">
-						<Button size="sm" className="bg-cyan-600 text-white hover:bg-cyan-700" disabled={!commentDraft.trim() || busy} onClick={onSubmit}>
+						<Button size="sm" disabled={!commentDraft.trim() || busy} onClick={onSubmit}>
 							<Send className="mr-2 h-4 w-4" /> Gửi bình luận
 						</Button>
 					</div>
@@ -862,7 +862,7 @@ function PostFormDialog({
 					<Field label="Tag chủ đề"><Input value={form.tags} onChange={(event) => onFormChange({ ...form, tags: event.target.value })} placeholder="Ví dụ: AI, RAG, Review sách" /></Field>
 					<div className="flex justify-end gap-2">
 						<Button variant="outline" onClick={onCancel}>Hủy</Button>
-						<Button className="bg-cyan-600 text-white hover:bg-cyan-700" disabled={submitting} onClick={onSubmit}>{submitLabel}</Button>
+						<Button disabled={submitting} onClick={onSubmit}>{submitLabel}</Button>
 					</div>
 				</div>
 			</DialogContent>
@@ -908,7 +908,7 @@ function ConfirmDialog({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
 	return (
 		<div className="space-y-2">
-			<label className="text-sm font-medium text-slate-700">{label}</label>
+			<label className="text-sm font-medium text-slate-700 dark:text-slate-200">{label}</label>
 			{children}
 		</div>
 	);
