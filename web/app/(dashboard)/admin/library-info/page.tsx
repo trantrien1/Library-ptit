@@ -1,0 +1,7 @@
+"use client";
+
+import { LibraryInfoModule } from "@/components/library-info/library-info-module";
+
+export default function AdminLibraryInfoPage() {
+	return <LibraryInfoModule />;
+}
