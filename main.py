@@ -3,13 +3,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.database import engine, Base
-from app.routers import auth_router, books_router, users_router, wishlist_router, borrows_router, chatbot_router, admin_stats_router, notifications_router, reviews_router
+from app.database import engine
+from app.database_schema import ensure_database_schema
+from app.routers import auth_router, books_router, users_router, wishlist_router, borrows_router, chatbot_router, admin_stats_router, notifications_router, reviews_router, platform_router, events_lab_router
 from app.services.notifications import reminder_scheduler
 from app.config import settings
 
 # Tạo tables trong database
-Base.metadata.create_all(bind=engine)
+ensure_database_schema(engine)
 
 # Tạo thư mục uploads
 os.makedirs(os.path.join(settings.UPLOAD_DIR, "books"), exist_ok=True)
@@ -56,6 +57,8 @@ app.include_router(chatbot_router)
 app.include_router(admin_stats_router)
 app.include_router(notifications_router)
 app.include_router(reviews_router)
+app.include_router(platform_router)
+app.include_router(events_lab_router)
 
 
 @app.get("/")

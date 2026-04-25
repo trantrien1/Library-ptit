@@ -7,3 +7,5 @@ from .chatbot import router as chatbot_router
 from .admin_stats import router as admin_stats_router
 from .notifications import router as notifications_router
 from .reviews import router as reviews_router
+from .platform import router as platform_router
+from .events_lab import router as events_lab_router

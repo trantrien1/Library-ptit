@@ -7,4 +7,25 @@ from .waitlist import Waitlist
 from .review import BookReview
 from .book_embedding import BookEmbedding
 from .chat import ChatSession, ChatMessage
+from .platform import (
+    Booking,
+    BookingResource,
+    ChallengeParticipant,
+    DigitalResource,
+    DiscussionGroup,
+    DiscussionPost,
+    Event,
+    EventRegistration,
+    Feedback,
+    Lab,
+    LabBooking,
+    LibrarianQuestion,
+    NewsPost,
+    PrintJob,
+    ReadingChallenge,
+    Recommendation,
+    Tutorial,
+    UserBadge,
+    VolunteerDonation,
+)
 

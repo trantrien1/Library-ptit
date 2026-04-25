@@ -17,12 +17,13 @@ class Settings:
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
-    # Gemini API (embeddings only)
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-
-    # OpenRouter API (text generation)
-    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
-    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "")
+    # OpenRouter API (text generation + embeddings)
+    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "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")
+    OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "openai/gpt-5.4-nano")
+    OPENROUTER_EMBEDDING_MODEL: str = os.getenv(
+        "OPENROUTER_EMBEDDING_MODEL",
+        "qwen/qwen3-embedding-4b",
+    )
 
     # Reminder scheduler + email
     REMINDER_DAYS_AHEAD_DEFAULT: int = int(os.getenv("REMINDER_DAYS_AHEAD_DEFAULT", "3"))

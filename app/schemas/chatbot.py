@@ -1,4 +1,6 @@
 from datetime import datetime
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -11,6 +13,8 @@ class HistoryMessage(BaseModel):
 # ── Request gửi tin nhắn ─────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=2000)
+    mode: str = Field("qa", pattern="^(qa|library|summary|quiz|flashcard)$")
+    options: dict[str, Any] = Field(default_factory=dict)
 
 
 # ── Nguồn sách trả về ────────────────────────────────────────────────────────
@@ -28,6 +32,8 @@ class ChatResponse(BaseModel):
     answer: str
     rewritten_query: str
     sources: list[BookSource] = []
+    result_type: str = "text"
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 # ── Session ──────────────────────────────────────────────────────────────────

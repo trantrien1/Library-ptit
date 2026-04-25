@@ -343,7 +343,7 @@ B. GỬI TIN NHẮN & NHẬN PHẢN HỒI:
            │      └─► Kết quả: "sách Python, programming Python"
            │
            ├─ 2️⃣ VECTOR SEARCH (Tìm sách liên quan)
-           │  ├─ Convert query → vector embedding (Google Gemini)
+           │  ├─ Convert query → vector embedding (OpenRouter)
            │  ├─ Compare với book_embeddings trong MySQL (cosine similarity)
            │  ├─ Lấy top-5 sách phù hợp nhất
            │  └─► BookSource[] (title, author, relevance_score)
@@ -387,7 +387,7 @@ D. INDEXING BOOKS (Index sách vào vector store):
    POST /api/chatbot/index (Admin only)
    └─► Backend chatbot.py
        ├─ Lấy tất cả books
-       ├─ Convert mỗi book thành embedding (Google Gemini)
+       ├─ Convert mỗi book thành embedding (OpenRouter)
        ├─ Lưu embedding vào book_embeddings table
        └─► Response: {message: "Indexed 150 books"}
 
@@ -408,7 +408,7 @@ D. INDEXING BOOKS (Index sách vào vector store):
 ├─ Đọc biến môi trường từ .env
 ├─ Cấu hình database connection string
 ├─ Cấu hình JWT (secret key, algorithm, expire time)
-└─ Cấu hình API keys (Gemini, OpenRouter)
+└─ Cấu hình API key và model OpenRouter
 
 📦 app/database.py
 ├─ Create SQLAlchemy engine
@@ -701,7 +701,7 @@ book_embeddings (vector store)
 ├─ id (PK)
 ├─ book_id (FK → books)
 ├─ embedding (vector 768-dim)
-├─ model (Google Gemini)
+├─ model (OpenRouter embedding model)
 └─ created_at
 ```
 

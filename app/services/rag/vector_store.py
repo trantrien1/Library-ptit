@@ -54,7 +54,7 @@ async def index_books(db: Session, books: list[Book]) -> int:
 
     documents = [_book_to_document(b) for b in books]
 
-    # Tạo embeddings qua Gemini
+    # Tạo embeddings qua OpenRouter
     embeddings = await llm.generate_embeddings(documents)
 
     for book, doc, emb in zip(books, documents, embeddings):

@@ -50,7 +50,7 @@ Backend phuc vu bai toan **quan ly thu vien online** cho 2 nhom nguoi dung:
 - Auth: JWT + OAuth2 bearer token (`app/utils/auth.py`, `app/utils/dependencies.py`)
 - Validation: Pydantic schemas (`app/schemas/*`)
 - AI/RAG:
-  - Embedding: Gemini (`app/services/rag/llm.py`)
+  - Embedding: OpenRouter (`app/services/rag/llm.py`)
   - Text generation: OpenRouter (`app/services/rag/llm.py`)
   - Vector search: embedding luu trong MySQL (`app/services/rag/vector_store.py`)
 
@@ -599,14 +599,14 @@ Diem con thieu:
 
 - DB: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
 - JWT: `SECRET_KEY`, `ALGORITHM`, `ACCESS_TOKEN_EXPIRE_MINUTES`
-- AI: `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`
+- AI: `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `OPENROUTER_EMBEDDING_MODEL`
 
 ### Anh huong den he thong
 
 - Thieu/ sai DB config -> khong ket noi duoc DB.
 - `SECRET_KEY` yeu -> token de bi forge.
 - Thieu `OPENROUTER_API_KEY` -> chatbot chat/index fail (500).
-- Thieu `GEMINI_API_KEY` -> embedding fail khi index/search vector.
+- Thieu `OPENROUTER_EMBEDDING_MODEL` -> embedding fail khi index/search vector.
 
 ### File cau hinh quan trong
 
@@ -657,7 +657,7 @@ Diem con thieu:
 
 ### Ngoai API nao duoc goi?
 
-- Gemini embedding API (`google.genai`) trong `app/services/rag/llm.py`.
+- OpenRouter embeddings API trong `app/services/rag/llm.py`.
 - OpenRouter chat completion API (`AsyncOpenAI` voi `base_url` OpenRouter) trong `app/services/rag/llm.py`.
 
 ### Wrapper external service
@@ -746,7 +746,7 @@ Diem con thieu:
 ### Code smell/coupling cao
 
 - Routers query DB va xu ly business mixed.
-- Chatbot status field `gemini_configured` dang duoc set boi `OPENROUTER_API_KEY` (ten bien co the gay hieu nham) trong `app/routers/chatbot.py::chatbot_status`.
+- Chatbot status dung cac field `openrouter_configured`, `openrouter_model_configured`, `openrouter_embedding_model_configured` trong `app/routers/chatbot.py::chatbot_status`.
 
 ### Luu y chua the xac nhan 100%
 
@@ -870,7 +870,7 @@ Neu coi ban la nguoi tao backend nay, ban can nam chac it nhat 16 diem sau:
 
 ### D. Chatbot
 
-`Client(user) -> /api/chatbot/sessions/{id}/chat -> auth -> DB history -> RAG pipeline -> OpenRouter/Gemini + MySQL embeddings -> save message -> response`
+`Client(user) -> /api/chatbot/sessions/{id}/chat -> auth -> DB history -> RAG pipeline -> OpenRouter chat/embeddings + MySQL embeddings -> save message -> response`
 
 ---
 

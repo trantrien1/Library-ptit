@@ -38,7 +38,7 @@ Dự án quản lý thư viện cho Học viện Công nghệ Bưu chính Viễn
 - **Vector Search**: Tìm kiếm sách tương tự bằng embedding
 - **Re-ranking**: Sắp xếp kết quả tìm kiếm
 - **Context Compression**: Nén thông tin sách liên quan
-- **LLM Generation**: Sinh câu trả lời bằng OpenRouter và Gemini
+- **LLM Generation**: Sinh câu trả lời bằng OpenRouter
 
 ## 🛠️ Công nghệ sử dụng
 
@@ -46,7 +46,7 @@ Dự án quản lý thư viện cho Học viện Công nghệ Bưu chính Viễn
 - **Database**: MySQL
 - **Frontend**: HTML/CSS/JavaScript (Vanilla)
 - **Authentication**: JWT (JSON Web Tokens)
-- **AI/ML**: Google Gemini (embeddings), OpenRouter (LLM), NumPy
+- **AI/ML**: OpenRouter (chat + embeddings), NumPy
 - **Vector Store**: MySQL với cosine similarity cho RAG
 
 ## 📁 Cấu trúc dự án
@@ -161,14 +161,16 @@ SMTP_FROM_EMAIL=your_email@gmail.com
 SMTP_USE_TLS=true
 
 # AI Configuration
-GEMINI_API_KEY=your_gemini_api_key  # ← API key từ Google AI Studio
 OPENROUTER_API_KEY=your_openrouter_api_key  # ← API key từ OpenRouter
+OPENROUTER_MODEL=your_openrouter_model_id  # ví dụ: model ID bạn chọn trên OpenRouter
+OPENROUTER_EMBEDDING_MODEL=openai/text-embedding-3-small
 ```
 
 ### Lấy API Keys cho Chatbot
 
-1. **GEMINI_API_KEY**: Đăng ký tại [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. **OPENROUTER_API_KEY**: Đăng ký tại [OpenRouter](https://openrouter.ai/keys)
+1. **OPENROUTER_API_KEY**: Đăng ký tại [OpenRouter](https://openrouter.ai/keys)
+2. **OPENROUTER_MODEL**: model chat dùng để sinh câu trả lời.
+3. **OPENROUTER_EMBEDDING_MODEL**: model embedding dùng để index và tra cứu vector.
 
 ### Bước 3: Cài đặt Python dependencies
 
