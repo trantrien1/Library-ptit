@@ -89,6 +89,25 @@ def ensure_database_schema(engine: Engine) -> None:
             "created_by": "ALTER TABLE library_tutorials ADD COLUMN created_by INT NULL",
             "updated_at": "ALTER TABLE library_tutorials ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
         },
+        "library_news": {
+            "news_type": "ALTER TABLE library_news ADD COLUMN news_type VARCHAR(40) DEFAULT 'announcement'",
+            "summary": "ALTER TABLE library_news ADD COLUMN summary TEXT",
+            "status": "ALTER TABLE library_news ADD COLUMN status VARCHAR(40) DEFAULT 'published'",
+            "related_target_type": "ALTER TABLE library_news ADD COLUMN related_target_type VARCHAR(40) DEFAULT 'none'",
+            "related_target_id": "ALTER TABLE library_news ADD COLUMN related_target_id INT NULL",
+            "cta_label": "ALTER TABLE library_news ADD COLUMN cta_label VARCHAR(120) NULL",
+            "cta_url": "ALTER TABLE library_news ADD COLUMN cta_url VARCHAR(500) NULL",
+            "updated_at": "ALTER TABLE library_news ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+        },
+        "library_feedback": {
+            "priority": "ALTER TABLE library_feedback ADD COLUMN priority VARCHAR(40) DEFAULT 'normal'",
+            "updated_at": "ALTER TABLE library_feedback ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+        },
+        "volunteer_donations": {
+            "title": "ALTER TABLE volunteer_donations ADD COLUMN title VARCHAR(180) NULL",
+            "contact_info": "ALTER TABLE volunteer_donations ADD COLUMN contact_info VARCHAR(180) NULL",
+            "updated_at": "ALTER TABLE volunteer_donations ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+        },
     }
     with engine.begin() as connection:
         for table_name, columns in legacy_columns.items():

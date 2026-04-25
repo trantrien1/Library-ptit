@@ -97,6 +97,14 @@ CREATE TABLE IF NOT EXISTS borrow_items (
 -- ============================================
 -- AI-Powered Discovery & Digital Resources
 -- ============================================
+CREATE TABLE IF NOT EXISTS library_settings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    setting_key VARCHAR(80) UNIQUE NOT NULL,
+    setting_value TEXT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_library_setting_key (setting_key)
+);
+
 CREATE TABLE IF NOT EXISTS digital_resources (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
@@ -418,9 +426,19 @@ CREATE TABLE IF NOT EXISTS library_news (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(200) NOT NULL,
     category VARCHAR(80) DEFAULT 'news',
+    news_type VARCHAR(40) DEFAULT 'announcement',
+    summary TEXT,
     content TEXT NOT NULL,
     published BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    status VARCHAR(40) DEFAULT 'published',
+    related_target_type VARCHAR(40) DEFAULT 'none',
+    related_target_id INT NULL,
+    cta_label VARCHAR(120) NULL,
+    cta_url VARCHAR(500) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_library_news_type (news_type),
+    INDEX idx_library_news_status (status)
 );
 
 CREATE TABLE IF NOT EXISTS library_feedback (
@@ -429,8 +447,10 @@ CREATE TABLE IF NOT EXISTS library_feedback (
     feedback_type VARCHAR(60) DEFAULT 'general',
     subject VARCHAR(180) NOT NULL,
     message TEXT NOT NULL,
+    priority VARCHAR(40) DEFAULT 'normal',
     status VARCHAR(40) DEFAULT 'new',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
@@ -438,10 +458,29 @@ CREATE TABLE IF NOT EXISTS volunteer_donations (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NULL,
     program_type VARCHAR(60) NOT NULL,
+    title VARCHAR(180) NULL,
+    contact_info VARCHAR(180) NULL,
     message TEXT,
-    status VARCHAR(40) DEFAULT 'submitted',
+    status VARCHAR(40) DEFAULT 'new',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS volunteer_programs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(180) NOT NULL,
+    description TEXT,
+    location VARCHAR(180),
+    schedule_note VARCHAR(180),
+    status VARCHAR(40) DEFAULT 'open',
+    related_target_type VARCHAR(40) DEFAULT 'none',
+    related_target_id INT NULL,
+    cta_label VARCHAR(120),
+    cta_url VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_volunteer_program_status (status)
 );
 
 -- ============================================

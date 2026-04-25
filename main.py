@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.database import engine
 from app.database_schema import ensure_database_schema
-from app.routers import auth_router, books_router, users_router, wishlist_router, borrows_router, chatbot_router, admin_stats_router, notifications_router, reviews_router, platform_router, events_lab_router
+from app.routers import auth_router, books_router, users_router, wishlist_router, borrows_router, chatbot_router, admin_stats_router, notifications_router, reviews_router, platform_router, events_lab_router, library_info_router, dashboard_router
 from app.services.notifications import reminder_scheduler
 from app.config import settings
 
@@ -59,6 +59,8 @@ app.include_router(notifications_router)
 app.include_router(reviews_router)
 app.include_router(platform_router)
 app.include_router(events_lab_router)
+app.include_router(library_info_router)
+app.include_router(dashboard_router)
 
 
 @app.get("/")

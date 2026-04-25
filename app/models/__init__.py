@@ -19,6 +19,7 @@ from .platform import (
     Feedback,
     Lab,
     LabBooking,
+    LibrarySetting,
     LibrarianQuestion,
     NewsPost,
     PrintJob,
@@ -27,5 +28,6 @@ from .platform import (
     Tutorial,
     UserBadge,
     VolunteerDonation,
+    VolunteerProgram,
 )
 

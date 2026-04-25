@@ -5,6 +5,15 @@ from sqlalchemy.sql import func
 from ..database import Base
 
 
+class LibrarySetting(Base):
+    __tablename__ = "library_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    setting_key = Column(String(80), unique=True, nullable=False, index=True)
+    setting_value = Column(Text, nullable=False)
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+
 class DigitalResource(Base):
     __tablename__ = "digital_resources"
 
@@ -383,9 +392,17 @@ class NewsPost(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(200), nullable=False)
     category = Column(String(80), default="news")
+    news_type = Column(String(40), default="announcement", index=True)
+    summary = Column(Text)
     content = Column(Text, nullable=False)
     published = Column(Boolean, default=True)
+    status = Column(String(40), default="published", index=True)
+    related_target_type = Column(String(40), default="none")
+    related_target_id = Column(Integer, nullable=True)
+    cta_label = Column(String(120), nullable=True)
+    cta_url = Column(String(500), nullable=True)
     created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
 
 class Feedback(Base):
@@ -396,8 +413,10 @@ class Feedback(Base):
     feedback_type = Column(String(60), default="general")
     subject = Column(String(180), nullable=False)
     message = Column(Text, nullable=False)
+    priority = Column(String(40), default="normal")
     status = Column(String(40), default="new")
     created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     user = relationship("User")
 
@@ -408,8 +427,28 @@ class VolunteerDonation(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     program_type = Column(String(60), nullable=False)
+    title = Column(String(180), nullable=True)
+    contact_info = Column(String(180), nullable=True)
     message = Column(Text)
     status = Column(String(40), default="submitted")
     created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     user = relationship("User")
+
+
+class VolunteerProgram(Base):
+    __tablename__ = "volunteer_programs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(180), nullable=False)
+    description = Column(Text)
+    location = Column(String(180), nullable=True)
+    schedule_note = Column(String(180), nullable=True)
+    status = Column(String(40), default="open", index=True)
+    related_target_type = Column(String(40), default="none")
+    related_target_id = Column(Integer, nullable=True)
+    cta_label = Column(String(120), nullable=True)
+    cta_url = Column(String(500), nullable=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

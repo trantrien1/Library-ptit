@@ -9,3 +9,5 @@ from .notifications import router as notifications_router
 from .reviews import router as reviews_router
 from .platform import router as platform_router
 from .events_lab import router as events_lab_router
+from .library_info import router as library_info_router
+from .dashboard import router as dashboard_router

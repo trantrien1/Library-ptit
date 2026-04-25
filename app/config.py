@@ -18,7 +18,7 @@ class Settings:
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
     # OpenRouter API (text generation + embeddings)
-    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "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")
+    OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY", "")
     OPENROUTER_MODEL: str = os.getenv("OPENROUTER_MODEL", "openai/gpt-5.4-nano")
     OPENROUTER_EMBEDDING_MODEL: str = os.getenv(
         "OPENROUTER_EMBEDDING_MODEL",

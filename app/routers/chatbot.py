@@ -11,7 +11,7 @@ from ..schemas.chatbot import (
     IndexResponse,
 )
 from ..services.rag import llm, pipeline, vector_store
-from ..services.rag.llm import QuotaExceededException
+from ..services.rag.llm import ProviderAuthException, QuotaExceededException
 from ..utils.dependencies import get_current_user
 from ..config import settings
 
@@ -460,6 +460,9 @@ async def chat(session_id: int, request: ChatRequest,
         except QuotaExceededException as e:
             db.rollback()
             raise HTTPException(status_code=503, detail=str(e))
+        except ProviderAuthException as e:
+            db.rollback()
+            raise HTTPException(status_code=502, detail=str(e))
         except Exception as e:
             result_type = "validation_error"
             answer = "AI trả về dữ liệu chưa đúng định dạng. Vui lòng thử lại."
@@ -495,6 +498,9 @@ async def chat(session_id: int, request: ChatRequest,
     except QuotaExceededException as e:
         db.rollback()
         raise HTTPException(status_code=503, detail=str(e))
+    except ProviderAuthException as e:
+        db.rollback()
+        raise HTTPException(status_code=502, detail=str(e))
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Lỗi chatbot: {str(e)}")
@@ -539,6 +545,8 @@ async def index_books(db: Session = Depends(get_db),
         return IndexResponse(message="Index thành công", indexed_count=count)
     except QuotaExceededException as e:
         raise HTTPException(status_code=503, detail=str(e))
+    except ProviderAuthException as e:
+        raise HTTPException(status_code=502, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Lỗi index: {str(e)}")
 

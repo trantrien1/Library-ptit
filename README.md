@@ -1,277 +1,366 @@
-# 📚 Thư viện PTIT - Hệ thống quản lý thư viện trực tuyến
+# Library PTIT Reader Workspace
 
-Dự án quản lý thư viện cho Học viện Công nghệ Bưu chính Viễn thông (PTIT).
+Hệ thống thư viện số cho sinh viên PTIT, gồm backend FastAPI, database MySQL và frontend Next.js. Dự án hỗ trợ quản lý sách, mượn trả, dashboard quản trị/người dùng, Chatbot AI RAG, cộng đồng học tập, sự kiện & lab, thông tin thư viện, feedback và đóng góp.
 
-## 📋 Tính năng
+## Tính Năng Chính
 
-### Dành cho Admin (Quản lý thư viện)
-- **Quản lý sách**: Thêm, sửa, xóa, tìm kiếm sách
-- **Quản lý độc giả**: Xem, cập nhật thông tin, reset mật khẩu, vô hiệu hóa tài khoản
-- **Quản lý mượn trả**: Duyệt/từ chối phiếu mượn, yêu cầu chỉnh sửa, xác nhận trả sách
-- **Dashboard thống kê**: Biểu đồ Bar/Line/Pie theo bộ lọc thời gian (7/30/90 ngày)
-- **Nhắc hạn chủ động**: Có thể chạy thủ công hoặc chạy scheduler định kỳ để gửi email nhắc hạn
+### Reader Workspace
 
-### Dành cho User (Độc giả)
-- **Xem danh sách sách**: Tìm kiếm, lọc theo danh mục
-- **Giỏ mượn (Wishlist)**: Thêm sách muốn mượn, điều chỉnh số lượng
-- **Tạo phiếu mượn**: Gửi yêu cầu mượn sách, chờ admin duyệt
-- **Theo dõi phiếu mượn**: Xem trạng thái, chỉnh sửa khi cần
-- **Nhắc hạn trả tự động**: Cảnh báo phiếu sắp đến hạn hoặc quá hạn ngay trên dashboard và trang phiếu mượn
-- **Xem nhanh chi tiết phiếu**: Từ banner nhắc hạn có nút mở thẳng modal chi tiết phiếu
+- Tra cứu sách, xem chi tiết, đánh giá và thêm vào giỏ mượn.
+- Tạo phiếu mượn, theo dõi trạng thái, chỉnh sửa, hủy và gửi yêu cầu gia hạn.
+- Dashboard cá nhân với KPI, lời nhắc, hoạt động cộng đồng, sự kiện/lab và chatbot.
+- Chatbot AI với các chế độ: Hỏi đáp thông minh, Chatbot thư viện, Tóm tắt nội dung, Quiz trắc nghiệm, Flashcard ôn tập.
+- Quiz và Flashcard được render bằng UI tương tác từ JSON do AI trả về.
+- Library Social Hub: tạo nhóm, tham gia/rời nhóm, duyệt thành viên, đăng bài, like, bình luận, phân quyền quản trị nhóm.
+- Sự kiện & Lab: đăng ký sự kiện, xem mã check-in, đặt lịch lab/thiết bị, xem tutorial/video.
+- Thông tin thư viện: giờ mở cửa, tin tức, thông báo, feedback, tình nguyện và đóng góp tài liệu.
 
-## 🤖 Chatbot AI với RAG
+### Admin Console
 
-### Tính năng
-- **Trợ lý thư viện thông minh**: Hỏi đáp về sách trong thư viện
-- **Tìm kiếm nâng cao**: Sử dụng RAG (Retrieval-Augmented Generation) để trả lời chính xác
-- **Lịch sử hội thoại**: Lưu trữ và quản lý các phiên trò chuyện
-- **Gợi ý sách**: Đề xuất sách dựa trên câu hỏi
+- Quản lý sách, độc giả, phiếu mượn và nhắc hạn trả.
+- Dashboard quản trị với thống kê thư viện, cộng đồng, sự kiện/lab, feedback và chatbot.
+- Quản lý Social Hub, nhóm, bài viết và quyền quản trị nhóm.
+- Quản lý sự kiện, danh sách đăng ký, check-in, lab, booking lab và tutorial.
+- Quản lý tin tức/thông báo, feedback, donation và chương trình tình nguyện.
 
-### Cách sử dụng
-1. Đăng nhập vào tài khoản user
-2. Truy cập trang Chatbot AI
-3. Nhập câu hỏi về sách (ví dụ: "Có sách nào về Python không?")
-4. Chatbot sẽ trả lời dựa trên dữ liệu sách trong thư viện
+## Công Nghệ
 
-### Công nghệ RAG
-- **Query Rewriting**: Viết lại câu hỏi để tìm kiếm tốt hơn
-- **Vector Search**: Tìm kiếm sách tương tự bằng embedding
-- **Re-ranking**: Sắp xếp kết quả tìm kiếm
-- **Context Compression**: Nén thông tin sách liên quan
-- **LLM Generation**: Sinh câu trả lời bằng OpenRouter
+- Backend: Python, FastAPI, SQLAlchemy, Pydantic
+- Database: MySQL
+- Frontend: Next.js 15, React 19, TypeScript, Tailwind CSS, Radix UI, lucide-react
+- Auth: JWT
+- AI: OpenRouter cho chat completion và embeddings
+- RAG: Query rewrite, vector search, rerank, context compression, answer generation
 
-## 🛠️ Công nghệ sử dụng
+## Cấu Trúc Dự Án
 
-- **Backend**: Python + FastAPI
-- **Database**: MySQL
-- **Frontend**: HTML/CSS/JavaScript (Vanilla)
-- **Authentication**: JWT (JSON Web Tokens)
-- **AI/ML**: OpenRouter (chat + embeddings), NumPy
-- **Vector Store**: MySQL với cosine similarity cho RAG
-
-## 📁 Cấu trúc dự án
-
-```
-LibraryPTIT/
-├── main.py                 # Entry point FastAPI
-├── requirements.txt        # Python dependencies
-├── .env                    # Biến môi trường (cần cấu hình)
+```text
+Library-ptit/
+├── main.py
+├── requirements.txt
+├── .env                         # Tạo thủ công, không commit
 ├── app/
-│   ├── config.py          # Cấu hình (DB, JWT)
-│   ├── database.py        # Kết nối MySQL
-│   ├── models/            # SQLAlchemy Models
-│   │   ├── user.py
-│   │   ├── book.py
-│   │   ├── book_embedding.py
-│   │   ├── wishlist.py
-│   │   ├── borrow.py
-│   │   ├── chat.py
-│   │   └── borrow.py
-│   ├── schemas/           # Pydantic Schemas
-│   │   ├── user.py
-│   │   ├── book.py
-│   │   ├── wishlist.py
-│   │   ├── borrow.py
-│   │   └── chatbot.py
-│   ├── routers/           # API Routes
-│   │   ├── auth.py
-│   │   ├── books.py
-│   │   ├── users.py
-│   │   ├── wishlist.py
-│   │   ├── borrows.py
-│   │   └── chatbot.py
-│   ├── services/          # Business Logic
-│   │   ├── rag/
-│   │   │   ├── __init__.py
-│   │   │   ├── pipeline.py
-│   │   │   ├── llm.py
-│   │   │   ├── vector_store.py
-│   │   │   ├── query_rewriter.py
-│   │   │   ├── reranker.py
-│   │   │   └── context_compressor.py
-│   └── utils/             # Utilities
-│       ├── auth.py        # JWT, Password hashing
-│       └── dependencies.py # Dependency injection
-├── frontend/
-│   ├── index.html         # Trang chủ
-│   ├── login.html         # Đăng nhập
-│   ├── register.html      # Đăng ký
-│   ├── css/style.css      # Styles
-│   ├── js/
-│   │   ├── api.js         # API calls
-│   │   ├── auth.js        # Auth utilities
-│   │   └── app.js         # UI utilities
-│   ├── admin/             # Trang Admin
-│   │   ├── dashboard.html
-│   │   ├── books.html
-│   │   ├── users.html
-│   │   └── borrows.html
-│   └── user/              # Trang User
-│       ├── dashboard.html
-│       ├── books.html
-│       ├── wishlist.html
-│       └── borrows.html
-└── sql/
-    └── init.sql           # Script tạo database
+│   ├── config.py
+│   ├── database.py
+│   ├── database_schema.py
+│   ├── models/
+│   ├── routers/
+│   ├── schemas/
+│   ├── services/
+│   │   └── rag/
+│   └── utils/
+├── scripts/
+│   ├── init_data.py
+│   └── demo_*.ps1
+├── sql/
+│   └── init.sql
+├── uploads/
+├── frontend/                    # Frontend HTML cũ, giữ để tham khảo
+└── web/                         # Frontend Next.js hiện tại
+    ├── app/
+    ├── components/
+    ├── lib/
+    └── public/
 ```
 
-## 🚀 Hướng dẫn cài đặt
+## Cài Đặt Backend
 
-### Bước 1: Cài đặt MySQL
+### 1. Tạo Database
 
-1. Tải và cài đặt MySQL: https://dev.mysql.com/downloads/
-2. Tạo database và chạy script SQL:
+Chạy MySQL và tạo schema bằng file SQL:
 
 ```bash
-# Đăng nhập MySQL
-mysql -u root -p
-
-# Chạy script tạo database
-source sql/init.sql
+mysql -u root -p < sql/init.sql
 ```
 
-Hoặc mở MySQL Workbench và chạy nội dung file `sql/init.sql`.
+Hoặc mở MySQL Workbench và chạy nội dung `sql/init.sql`.
 
-### Bước 2: Cấu hình môi trường
+### 2. Tạo File `.env`
 
-1. Mở file `.env` và cập nhật thông tin:
+Tạo file `.env` tại đúng thư mục root backend:
+
+```text
+Library-ptit/.env
+```
+
+Ví dụ:
 
 ```env
-# Database Configuration
+# Database
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
-DB_PASSWORD=your_mysql_password  # ← Đổi thành password của bạn
+DB_PASSWORD=your_mysql_password
 DB_NAME=library_ptit
 
-# JWT Configuration
-SECRET_KEY=your-super-secret-key-change-this  # ← Đổi thành key bí mật
+# JWT
+SECRET_KEY=change-this-secret-key
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-# Reminder Scheduler + SMTP (tuỳ chọn)
+# OpenRouter
+OPENROUTER_API_KEY=sk-or-v1-your-new-key
+OPENROUTER_MODEL=openai/gpt-5.4-nano
+OPENROUTER_EMBEDDING_MODEL=qwen/qwen3-embedding-4b
+
+# Uploads
+UPLOAD_DIR=uploads
+
+# Reminder scheduler + email, optional
 REMINDER_DAYS_AHEAD_DEFAULT=3
 REMINDER_SCHEDULER_ENABLED=false
 REMINDER_SCHEDULER_INTERVAL_MINUTES=60
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USERNAME=your_email@gmail.com
-SMTP_PASSWORD=your_app_password
-SMTP_FROM_EMAIL=your_email@gmail.com
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_FROM_EMAIL=
 SMTP_USE_TLS=true
-
-# AI Configuration
-OPENROUTER_API_KEY=your_openrouter_api_key  # ← API key từ OpenRouter
-OPENROUTER_MODEL=your_openrouter_model_id  # ví dụ: model ID bạn chọn trên OpenRouter
-OPENROUTER_EMBEDDING_MODEL=openai/text-embedding-3-small
 ```
 
-### Lấy API Keys cho Chatbot
 
-1. **OPENROUTER_API_KEY**: Đăng ký tại [OpenRouter](https://openrouter.ai/keys)
-2. **OPENROUTER_MODEL**: model chat dùng để sinh câu trả lời.
-3. **OPENROUTER_EMBEDDING_MODEL**: model embedding dùng để index và tra cứu vector.
-
-### Bước 3: Cài đặt Python dependencies
+### 3. Cài Dependencies
 
 ```bash
-# Tạo virtual environment (khuyến nghị)
 python -m venv venv
-
-# Kích hoạt venv
-# Windows:
 venv\Scripts\activate
-# Linux/Mac:
-source venv/bin/activate
-
-# Cài đặt packages
 pip install -r requirements.txt
 ```
 
-### Bước 4: Chạy ứng dụng
+Linux/macOS:
 
 ```bash
-# Chạy server
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 4. Seed Dữ Liệu Mẫu
+
+```bash
+python scripts/init_data.py
+```
+
+Script này tạo:
+
+- Admin/user mẫu
+- 10 sách mẫu và ảnh bìa từ `web/public`
+- Dữ liệu cộng đồng, sự kiện/lab, tutorial, tin tức, feedback/donation mẫu
+- Embeddings cho sách nếu `OPENROUTER_API_KEY` hợp lệ
+
+Nếu chỉ muốn kiểm tra biến môi trường backend đang đọc:
+
+```powershell
+$env:PYTHONIOENCODING='utf-8'
+.\venv\Scripts\python.exe -c "from app.config import settings; print(settings.DB_HOST, settings.DB_NAME, bool(settings.OPENROUTER_API_KEY), settings.OPENROUTER_MODEL, settings.OPENROUTER_EMBEDDING_MODEL)"
+```
+
+### 5. Chạy Backend
+
+```bash
 uvicorn main:app --reload
-
-# Hoặc
-python -m uvicorn main:app --reload
 ```
 
-Server sẽ chạy tại: http://localhost:8000
+Backend chạy tại:
 
-## 📖 Sử dụng
-
-### Truy cập ứng dụng
-
-- **Trang chủ**: http://localhost:8000/static/index.html
-- **Đăng nhập**: http://localhost:8000/static/login.html
-- **API Docs**: http://localhost:8000/docs (Swagger UI)
-
-### Demo nhanh API thống kê Admin
-
-Chạy script PowerShell để gọi 3 endpoint thống kê (overview, books, users):
-
-```powershell
-Set-Location d:\Developer\Library-ptit
-.\scripts\demo_admin_stats.ps1 -BaseUrl "http://127.0.0.1:8000" -Username "admin" -Password "admin123" -PeriodDays 30
+```text
+http://127.0.0.1:8000
 ```
 
-### Demo nhanh API nhắc hạn trả
+API docs:
 
-Chạy script PowerShell để xem phiếu đang mượn và kết quả nhắc hạn trả theo 2 khung thời gian:
-
-```powershell
-Set-Location d:\Developer\Library-ptit
-.\scripts\demo_due_reminders.ps1 -BaseUrl "http://127.0.0.1:8000" -Username "user1" -Password "123456" -DaysAhead 3
+```text
+http://127.0.0.1:8000/docs
 ```
 
-### Demo nhanh scheduler/email nhắc hạn (Admin)
+## Cài Đặt Frontend Next.js
 
-Kiểm tra trạng thái scheduler và chạy nhắc hạn thủ công bằng tài khoản admin:
-
-```powershell
-Set-Location d:\Developer\Library-ptit
-.\scripts\demo_reminder_scheduler.ps1 -BaseUrl "http://127.0.0.1:8000" -Username "admin" -Password "admin123" -DaysAhead 3 -DryRun $true
+```bash
+cd web
+npm install
+npm run dev
 ```
 
-Hoặc gọi thủ công từng request:
+Frontend mặc định chạy tại:
 
-```powershell
-$baseUrl = "http://127.0.0.1:8000"
-$login = Invoke-RestMethod -Method Post -Uri "$baseUrl/api/auth/login" -ContentType "application/x-www-form-urlencoded" -Body "username=admin&password=admin123"
-$headers = @{ Authorization = "Bearer $($login.access_token)" }
-Invoke-RestMethod -Method Get -Uri "$baseUrl/api/admin/notifications/reminders/status" -Headers $headers | ConvertTo-Json -Depth 6
-Invoke-RestMethod -Method Post -Uri "$baseUrl/api/admin/notifications/reminders/run?days_ahead=3&dry_run=true" -Headers $headers | ConvertTo-Json -Depth 6
+```text
+http://localhost:3000
 ```
 
-> Lưu ý: để gửi email thật, cần cấu hình SMTP đầy đủ và đặt `REMINDER_SCHEDULER_ENABLED=true`.
+Nếu port 3000 bận, Next.js sẽ tự dùng port khác.
 
-### Tài khoản mặc định
+Build production:
 
-- **Admin**:
-  - Username: `admin`
-  - Password: `admin123`
+```bash
+cd web
+npm run build
+npm run start
+```
 
-### Quy trình mượn sách
+Nếu cần cấu hình API root cho frontend, tạo `web/.env.local`:
 
-1. **User đăng ký/đăng nhập**
-2. **Xem danh sách sách** → Thêm sách vào giỏ mượn
-3. **Vào giỏ mượn** → Điều chỉnh số lượng → Chọn ngày trả → Tạo phiếu mượn
-4. **Phiếu mượn ở trạng thái "Chờ duyệt"**
-5. **Admin duyệt phiếu** → Số lượng sách giảm
-6. **Nếu không đủ sách** → Admin yêu cầu chỉnh sửa → User chỉnh lại
-7. **Khi trả sách** → Admin xác nhận → Số lượng sách tăng lại
+```env
+NEXT_PUBLIC_API_ROOT=http://127.0.0.1:8000
+```
 
-### Sử dụng Chatbot AI
+## Tài Khoản Mẫu
 
-1. Đăng nhập với tài khoản user
-2. Truy cập "Chatbot AI" từ menu
-3. Nhập câu hỏi về sách (ví dụ: "Tìm sách về trí tuệ nhân tạo")
-4. Chatbot sẽ trả lời và hiển thị sách liên quan
-5. Có thể tạo nhiều phiên trò chuyện khác nhau
+Admin:
 
----
-Dự án được phát triển cho môn học Python - PTIT.
-© 2026 Thư viện PTIT. All rights reserved.
+```text
+username: admin
+password: admin123
+```
 
+User:
+
+```text
+username: user1
+password: user123
+```
+
+Một số user cộng đồng mẫu dùng password:
+
+```text
+user123
+```
+
+## Chatbot AI Và OpenRouter
+
+Chatbot dùng OpenRouter cho:
+
+- Chat completion: hỏi đáp, RAG, tóm tắt, quiz, flashcard
+- Embeddings: index sách và tìm kiếm vector
+
+Các chế độ `quiz` và `flashcard` không đi qua RAG. Backend yêu cầu AI trả JSON hợp lệ, validate schema rồi frontend render thành UI tương tác.
+
+Nếu gặp lỗi:
+
+```text
+OpenRouter từ chối API key (401 User not found)
+```
+
+Kiểm tra theo thứ tự:
+
+1. File `.env` nằm đúng tại `Library-ptit/.env`.
+2. `OPENROUTER_API_KEY` là key mới, chưa bị revoke.
+3. Không còn key cũ ở biến môi trường hệ thống hoặc `.env` thư mục cha.
+4. Backend đã được restart sau khi đổi key.
+5. Tài khoản OpenRouter còn credit/quota và model được phép sử dụng.
+
+Nếu từng lộ key trên Git:
+
+1. Revoke key cũ trên OpenRouter.
+2. Tạo key mới.
+3. Xóa key khỏi git history bằng BFG Repo-Cleaner hoặc `git filter-repo`.
+4. Force-push lịch sử đã làm sạch nếu repo remote cần sạch.
+
+## Các Endpoint Chính
+
+Auth:
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+
+Books:
+
+- `GET /api/books`
+- `POST /api/books`
+- `PATCH /api/books/{id}`
+- `DELETE /api/books/{id}`
+
+Borrowing:
+
+- `GET /api/borrows`
+- `POST /api/borrows`
+- `PATCH /api/borrows/{id}`
+- `POST /api/borrows/{id}/approve`
+- `POST /api/borrows/{id}/return`
+
+Chatbot:
+
+- `GET /api/chatbot/sessions`
+- `POST /api/chatbot/sessions`
+- `POST /api/chatbot/sessions/{session_id}/chat`
+- `POST /api/chatbot/index`
+- `GET /api/chatbot/status`
+
+Social Hub:
+
+- `GET /api/platform/groups`
+- `POST /api/platform/groups`
+- `POST /api/platform/groups/{group_id}/join`
+- `DELETE /api/platform/groups/{group_id}/leave`
+- `PATCH /api/platform/groups/{group_id}/members/{user_id}/approve`
+- `PATCH /api/platform/groups/{group_id}/members/{user_id}/reject`
+- `GET /api/platform/posts`
+- `POST /api/platform/posts`
+- `PATCH /api/platform/posts/{post_id}`
+- `DELETE /api/platform/posts/{post_id}`
+
+Sự kiện & Lab:
+
+- `GET /api/events`
+- `POST /api/events`
+- `POST /api/events/{id}/register`
+- `DELETE /api/events/{id}/register`
+- `POST /api/events/{id}/checkin`
+- `GET /api/labs`
+- `POST /api/labs/{id}/bookings`
+- `GET /api/lab-bookings`
+- `PATCH /api/lab-bookings/{id}/approve`
+- `PATCH /api/lab-bookings/{id}/reject`
+- `GET /api/tutorials`
+
+Thông tin thư viện:
+
+- `GET /api/library-info`
+- `GET /api/news`
+- `POST /api/feedback`
+- `GET /api/my-feedback`
+- `POST /api/donations`
+- `GET /api/volunteer-programs`
+
+Dashboard:
+
+- `GET /api/dashboard/user/overview`
+- `GET /api/dashboard/admin/overview`
+
+## Kiểm Tra Nhanh
+
+Backend syntax:
+
+```bash
+python -m py_compile app/config.py app/services/rag/llm.py app/routers/chatbot.py scripts/init_data.py
+```
+
+Frontend build:
+
+```bash
+cd web
+npm run build
+```
+
+Health check:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Chatbot status:
+
+```bash
+curl http://127.0.0.1:8000/api/chatbot/status
+```
+
+## Ghi Chú Bảo Mật
+
+- `.env` không được commit.
+- Không hard-code API key trong `app/config.py`.
+- Khi nghi ngờ key đã lộ, revoke ngay và tạo key mới.
+- Không chia sẻ database password, JWT secret hoặc OpenRouter key trong issue/commit/log public.
+
+## License
+
+Dự án phục vụ học tập và phát triển hệ thống thư viện số PTIT.

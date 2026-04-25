@@ -40,8 +40,36 @@ from app.models.platform import (
     Tutorial,
     UserBadge,
     VolunteerDonation,
+    VolunteerProgram,
 )
 from app.utils.auth import get_password_hash
+
+
+BOOK_COVER_IMAGES = {
+    "Lập trình Python cơ bản": "/ChatGPT Image 20_47_27 25 thg 4, 2026 (1).png",
+    "Cấu trúc dữ liệu và giải thuật": "/ChatGPT Image 20_47_27 25 thg 4, 2026 (2).png",
+    "Mạng máy tính": "/ChatGPT Image 20_47_27 25 thg 4, 2026 (3).png",
+    "Cơ sở dữ liệu": "/ChatGPT Image 20_47_28 25 thg 4, 2026 (4).png",
+    "Toán cao cấp A1": "/ChatGPT Image 20_47_28 25 thg 4, 2026 (5).png",
+    "Vật lý đại cương": "/ChatGPT Image 20_47_28 25 thg 4, 2026 (6).png",
+    "Lập trình Web với HTML/CSS/JavaScript": "/ChatGPT Image 20_47_28 25 thg 4, 2026 (7).png",
+    "Trí tuệ nhân tạo": "/ChatGPT Image 20_47_28 25 thg 4, 2026 (8).png",
+    "Tiếng Anh chuyên ngành CNTT": "/ChatGPT Image 20_47_28 25 thg 4, 2026 (9).png",
+    "Kinh tế vĩ mô": "/ChatGPT Image 20_47_28 25 thg 4, 2026 (10).png",
+}
+
+
+def update_sample_book_covers(db):
+    updated = 0
+    for title, cover_image in BOOK_COVER_IMAGES.items():
+        book = db.query(Book).filter(Book.title == title).first()
+        if book and book.cover_image != cover_image:
+            book.cover_image = cover_image
+            updated += 1
+    if updated:
+        db.commit()
+        print(f"✅ Đã cập nhật ảnh bìa cho {updated} cuốn sách mẫu")
+    return updated
 from app.services.rag import vector_store
 
 def ensure_legacy_columns():
@@ -97,6 +125,25 @@ def ensure_legacy_columns():
             "attachments": "ALTER TABLE library_tutorials ADD COLUMN attachments TEXT",
             "created_by": "ALTER TABLE library_tutorials ADD COLUMN created_by INT NULL",
             "updated_at": "ALTER TABLE library_tutorials ADD COLUMN updated_at TIMESTAMP NULL",
+        },
+        "library_news": {
+            "news_type": "ALTER TABLE library_news ADD COLUMN news_type VARCHAR(40) DEFAULT 'announcement'",
+            "summary": "ALTER TABLE library_news ADD COLUMN summary TEXT",
+            "status": "ALTER TABLE library_news ADD COLUMN status VARCHAR(40) DEFAULT 'published'",
+            "related_target_type": "ALTER TABLE library_news ADD COLUMN related_target_type VARCHAR(40) DEFAULT 'none'",
+            "related_target_id": "ALTER TABLE library_news ADD COLUMN related_target_id INT NULL",
+            "cta_label": "ALTER TABLE library_news ADD COLUMN cta_label VARCHAR(120) NULL",
+            "cta_url": "ALTER TABLE library_news ADD COLUMN cta_url VARCHAR(500) NULL",
+            "updated_at": "ALTER TABLE library_news ADD COLUMN updated_at TIMESTAMP NULL",
+        },
+        "library_feedback": {
+            "priority": "ALTER TABLE library_feedback ADD COLUMN priority VARCHAR(40) DEFAULT 'normal'",
+            "updated_at": "ALTER TABLE library_feedback ADD COLUMN updated_at TIMESTAMP NULL",
+        },
+        "volunteer_donations": {
+            "title": "ALTER TABLE volunteer_donations ADD COLUMN title VARCHAR(180) NULL",
+            "contact_info": "ALTER TABLE volunteer_donations ADD COLUMN contact_info VARCHAR(180) NULL",
+            "updated_at": "ALTER TABLE volunteer_donations ADD COLUMN updated_at TIMESTAMP NULL",
         },
     }
 
@@ -156,6 +203,7 @@ def create_sample_books():
         existing_books = db.query(Book).count()
         if existing_books > 0:
             print(f"ℹ️ Database đã có {existing_books} cuốn sách")
+            update_sample_book_covers(db)
             return
 
         # Danh sách sách mẫu
@@ -167,7 +215,8 @@ def create_sample_books():
                 "category": "Công nghệ thông tin",
                 "description": "Sách hướng dẫn lập trình Python từ cơ bản đến nâng cao, phù hợp cho người mới bắt đầu.",
                 "quantity": 10,
-                "available_quantity": 10
+                "available_quantity": 10,
+                "cover_image": BOOK_COVER_IMAGES["Lập trình Python cơ bản"]
             },
             {
                 "title": "Cấu trúc dữ liệu và giải thuật",
@@ -176,7 +225,8 @@ def create_sample_books():
                 "category": "Công nghệ thông tin",
                 "description": "Sách về các cấu trúc dữ liệu và thuật toán phổ biến trong lập trình.",
                 "quantity": 5,
-                "available_quantity": 5
+                "available_quantity": 5,
+                "cover_image": BOOK_COVER_IMAGES["Cấu trúc dữ liệu và giải thuật"]
             },
             {
                 "title": "Mạng máy tính",
@@ -185,7 +235,8 @@ def create_sample_books():
                 "category": "Công nghệ thông tin",
                 "description": "Giáo trình mạng máy tính, bao gồm các khái niệm cơ bản về networking.",
                 "quantity": 8,
-                "available_quantity": 8
+                "available_quantity": 8,
+                "cover_image": BOOK_COVER_IMAGES["Mạng máy tính"]
             },
             {
                 "title": "Cơ sở dữ liệu",
@@ -194,7 +245,8 @@ def create_sample_books():
                 "category": "Công nghệ thông tin",
                 "description": "Nhập môn cơ sở dữ liệu, SQL và thiết kế database.",
                 "quantity": 12,
-                "available_quantity": 12
+                "available_quantity": 12,
+                "cover_image": BOOK_COVER_IMAGES["Cơ sở dữ liệu"]
             },
             {
                 "title": "Toán cao cấp A1",
@@ -203,7 +255,8 @@ def create_sample_books():
                 "category": "Toán học",
                 "description": "Giáo trình toán cao cấp A1 dành cho sinh viên đại học.",
                 "quantity": 15,
-                "available_quantity": 15
+                "available_quantity": 15,
+                "cover_image": BOOK_COVER_IMAGES["Toán cao cấp A1"]
             },
             {
                 "title": "Vật lý đại cương",
@@ -212,7 +265,8 @@ def create_sample_books():
                 "category": "Vật lý",
                 "description": "Giáo trình vật lý đại cương cho sinh viên khối kỹ thuật.",
                 "quantity": 10,
-                "available_quantity": 10
+                "available_quantity": 10,
+                "cover_image": BOOK_COVER_IMAGES["Vật lý đại cương"]
             },
             {
                 "title": "Lập trình Web với HTML/CSS/JavaScript",
@@ -221,7 +275,8 @@ def create_sample_books():
                 "category": "Công nghệ thông tin",
                 "description": "Hướng dẫn lập trình web frontend từ cơ bản đến nâng cao.",
                 "quantity": 7,
-                "available_quantity": 7
+                "available_quantity": 7,
+                "cover_image": BOOK_COVER_IMAGES["Lập trình Web với HTML/CSS/JavaScript"]
             },
             {
                 "title": "Trí tuệ nhân tạo",
@@ -230,7 +285,8 @@ def create_sample_books():
                 "category": "Công nghệ thông tin",
                 "description": "Giới thiệu về AI, Machine Learning và Deep Learning.",
                 "quantity": 6,
-                "available_quantity": 6
+                "available_quantity": 6,
+                "cover_image": BOOK_COVER_IMAGES["Trí tuệ nhân tạo"]
             },
             {
                 "title": "Tiếng Anh chuyên ngành CNTT",
@@ -239,7 +295,8 @@ def create_sample_books():
                 "category": "Ngoại ngữ",
                 "description": "Từ vựng và ngữ pháp tiếng Anh trong lĩnh vực CNTT.",
                 "quantity": 20,
-                "available_quantity": 20
+                "available_quantity": 20,
+                "cover_image": BOOK_COVER_IMAGES["Tiếng Anh chuyên ngành CNTT"]
             },
             {
                 "title": "Kinh tế vĩ mô",
@@ -248,7 +305,8 @@ def create_sample_books():
                 "category": "Kinh tế",
                 "description": "Giáo trình kinh tế vĩ mô cơ bản.",
                 "quantity": 8,
-                "available_quantity": 8
+                "available_quantity": 8,
+                "cover_image": BOOK_COVER_IMAGES["Kinh tế vĩ mô"]
             }
         ]
 
@@ -811,22 +869,98 @@ def create_platform_sample_data():
             print(f"✅ Đã tạo {len(tutorials)} tutorial mẫu")
 
         if db.query(NewsPost).count() == 0:
+            first_event = db.query(Event).filter(Event.status == "open").order_by(Event.id.asc()).first()
+            first_lab = db.query(Lab).filter(Lab.status == "available").order_by(Lab.id.asc()).first()
+            first_tutorial = db.query(Tutorial).filter(Tutorial.status == "published").order_by(Tutorial.id.asc()).first()
             news = [
                 NewsPost(
                     title="Thư viện PTIT ra mắt cổng tài nguyên số",
                     category="announcement",
+                    news_type="announcement",
+                    summary="Bạn đọc có thể tra cứu tài liệu số, nhận gợi ý học tập và theo dõi thông báo mới từ thư viện.",
                     content="Bạn đọc có thể truy cập ebook, luận văn, video workshop và tài nguyên đa phương tiện ngay trên hệ thống.",
                     published=True,
+                    status="published",
+                    related_target_type="none",
                 ),
                 NewsPost(
                     title="Mở đăng ký Innovation Lab tháng này",
                     category="lab",
+                    news_type="lab",
+                    summary="Sinh viên có thể đặt lịch sử dụng thiết bị VR, máy tính nghiên cứu và không gian lab sáng tạo.",
                     content="Sinh viên có thể đặt lịch sử dụng thiết bị VR, máy tính nghiên cứu và không gian lab sáng tạo.",
                     published=True,
+                    status="published",
+                    related_target_type="lab",
+                    related_target_id=first_lab.id if first_lab else None,
+                    cta_label="Đặt lịch Lab",
+                    cta_url=f"/user/events?tab=labs&labId={first_lab.id}" if first_lab else "/user/events?tab=labs",
+                ),
+                NewsPost(
+                    title="Workshop AI trong nghiên cứu học thuật sắp mở đăng ký",
+                    category="event",
+                    news_type="event",
+                    summary="Tham gia workshop để học cách dùng AI và RAG trong quá trình tìm kiếm, tóm tắt và trích dẫn tài liệu.",
+                    content="Workshop dành cho sinh viên muốn ứng dụng AI trong học tập và nghiên cứu. Số chỗ có hạn, vui lòng đăng ký trước hạn.",
+                    published=True,
+                    status="published",
+                    related_target_type="event",
+                    related_target_id=first_event.id if first_event else None,
+                    cta_label="Đăng ký sự kiện",
+                    cta_url=f"/user/events?tab=upcoming&eventId={first_event.id}" if first_event else "/user/events?tab=upcoming",
+                ),
+                NewsPost(
+                    title="Video hướng dẫn trích dẫn tài liệu IEEE",
+                    category="tutorial",
+                    news_type="tutorial",
+                    summary="Xem nhanh video hướng dẫn chuẩn hóa trích dẫn và bibliography theo IEEE.",
+                    content="Tutorial giúp sinh viên chuẩn hóa trích dẫn trong báo cáo, đồ án và bài nghiên cứu.",
+                    published=True,
+                    status="published",
+                    related_target_type="tutorial",
+                    related_target_id=first_tutorial.id if first_tutorial else None,
+                    cta_label="Xem hướng dẫn",
+                    cta_url=f"/user/events?tab=tutorials&tutorialId={first_tutorial.id}" if first_tutorial else "/user/events?tab=tutorials",
                 ),
             ]
             db.add_all(news)
             print(f"✅ Đã tạo {len(news)} tin tức mẫu")
+
+        if db.query(VolunteerProgram).count() == 0:
+            first_event = db.query(Event).filter(Event.status == "open").order_by(Event.id.asc()).first()
+            programs = [
+                VolunteerProgram(
+                    title="Hỗ trợ workshop AI",
+                    description="Hỗ trợ check-in, hướng dẫn chỗ ngồi và chuẩn bị tài liệu cho workshop AI.",
+                    location="Hội trường Library PTIT",
+                    schedule_note="Theo lịch workshop gần nhất",
+                    status="open",
+                    related_target_type="event",
+                    related_target_id=first_event.id if first_event else None,
+                    cta_label="Đăng ký tham gia",
+                    cta_url=f"/user/events?tab=upcoming&eventId={first_event.id}" if first_event else "/user/events?tab=upcoming",
+                ),
+                VolunteerProgram(
+                    title="Hướng dẫn bạn đọc mới",
+                    description="Giới thiệu cách tra cứu tài liệu, mượn sách và sử dụng cổng thư viện số cho sinh viên năm nhất.",
+                    location="Khu tra cứu tầng 1",
+                    schedule_note="Mỗi chiều thứ 4",
+                    status="open",
+                    related_target_type="volunteer",
+                    cta_label="Đăng ký tham gia",
+                ),
+                VolunteerProgram(
+                    title="Sắp xếp sách cuối tuần",
+                    description="Cùng thủ thư sắp xếp lại khu sách chuyên ngành và dán nhãn tài liệu mới.",
+                    location="Kho sách mở",
+                    schedule_note="Sáng thứ 7 hằng tuần",
+                    status="open",
+                    related_target_type="volunteer",
+                    cta_label="Đăng ký tham gia",
+                ),
+            ]
+            db.add_all(programs)
+            print(f"✅ Đã tạo {len(programs)} chương trình tình nguyện mẫu")
 
         if db.query(VolunteerDonation).filter(VolunteerDonation.user_id == user.id).count() == 0:
             db.add(VolunteerDonation(

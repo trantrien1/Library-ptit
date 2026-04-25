@@ -462,13 +462,35 @@ class EventCheckinIn(BaseModel):
 class NewsPostCreate(BaseModel):
     title: str
     category: str = "news"
+    news_type: str = "announcement"
+    summary: Optional[str] = None
     content: str
     published: bool = True
+    status: str = "published"
+    related_target_type: str = "none"
+    related_target_id: Optional[int] = None
+    cta_label: Optional[str] = None
+    cta_url: Optional[str] = None
+
+
+class NewsPostUpdate(BaseModel):
+    title: Optional[str] = None
+    category: Optional[str] = None
+    news_type: Optional[str] = None
+    summary: Optional[str] = None
+    content: Optional[str] = None
+    published: Optional[bool] = None
+    status: Optional[str] = None
+    related_target_type: Optional[str] = None
+    related_target_id: Optional[int] = None
+    cta_label: Optional[str] = None
+    cta_url: Optional[str] = None
 
 
 class NewsPostOut(NewsPostCreate):
     id: int
     created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -478,6 +500,7 @@ class FeedbackCreate(BaseModel):
     feedback_type: str = "general"
     subject: str
     message: str
+    priority: str = "normal"
 
 
 class FeedbackOut(FeedbackCreate):
@@ -485,6 +508,8 @@ class FeedbackOut(FeedbackCreate):
     user_id: Optional[int] = None
     status: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
+    user: Optional[UserResponse] = None
 
     class Config:
         from_attributes = True
@@ -492,6 +517,8 @@ class FeedbackOut(FeedbackCreate):
 
 class VolunteerDonationCreate(BaseModel):
     program_type: str
+    title: Optional[str] = None
+    contact_info: Optional[str] = None
     message: Optional[str] = None
 
 
@@ -500,9 +527,65 @@ class VolunteerDonationOut(VolunteerDonationCreate):
     user_id: Optional[int] = None
     status: str
     created_at: datetime
+    updated_at: Optional[datetime] = None
+    user: Optional[UserResponse] = None
 
     class Config:
         from_attributes = True
+
+
+class VolunteerProgramCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    location: Optional[str] = None
+    schedule_note: Optional[str] = None
+    status: str = "open"
+    related_target_type: str = "none"
+    related_target_id: Optional[int] = None
+    cta_label: Optional[str] = None
+    cta_url: Optional[str] = None
+
+
+class VolunteerProgramUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    location: Optional[str] = None
+    schedule_note: Optional[str] = None
+    status: Optional[str] = None
+    related_target_type: Optional[str] = None
+    related_target_id: Optional[int] = None
+    cta_label: Optional[str] = None
+    cta_url: Optional[str] = None
+
+
+class VolunteerProgramOut(VolunteerProgramCreate):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class FeedbackStatusUpdate(BaseModel):
+    status: str
+
+
+class DonationStatusUpdate(BaseModel):
+    status: str
+
+
+class LibraryInfoOut(BaseModel):
+    locations: list[dict]
+    opening_hours: list[dict]
+    rules: list[str]
+    today_status: str
+
+
+class LibraryInfoUpdate(BaseModel):
+    locations: Optional[list[dict]] = None
+    opening_hours: Optional[list[dict]] = None
+    rules: Optional[list[str]] = None
 
 
 class PlatformOverview(BaseModel):

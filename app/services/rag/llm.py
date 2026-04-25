@@ -13,12 +13,18 @@ class QuotaExceededException(Exception):
     pass
 
 
+class ProviderAuthException(Exception):
+    """Raised khi OpenRouter từ chối API key hoặc project/user không hợp lệ."""
+    pass
+
+
 _openrouter_client = AsyncOpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=settings.OPENROUTER_API_KEY,
 )
 
 _RATE_LIMIT_KEYS = ("429", "RESOURCE_EXHAUSTED", "quota", "rate_limit", "too many")
+_AUTH_ERROR_KEYS = ("401", "unauthorized", "user not found", "invalid api key", "no auth credentials")
 
 
 def _is_rate_limit(error: Exception) -> bool:
@@ -26,7 +32,17 @@ def _is_rate_limit(error: Exception) -> bool:
     return any(key in text for key in _RATE_LIMIT_KEYS)
 
 
+def _is_auth_error(error: Exception) -> bool:
+    text = str(error).lower()
+    return any(key in text for key in _AUTH_ERROR_KEYS)
+
+
 def _raise_openrouter_error(error: Exception, service_name: str):
+    if _is_auth_error(error):
+        raise ProviderAuthException(
+            "OpenRouter từ chối API key (401 User not found). "
+            "Hãy kiểm tra OPENROUTER_API_KEY trong file .env và restart backend."
+        ) from error
     if _is_rate_limit(error):
         raise QuotaExceededException(
             f"OpenRouter {service_name} tạm thời không khả dụng do vượt giới hạn. "
