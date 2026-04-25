@@ -1,5 +1,6 @@
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -9,11 +10,15 @@ from app.routers import auth_router, books_router, users_router, wishlist_router
 from app.services.notifications import reminder_scheduler
 from app.config import settings
 
+BASE_DIR = Path(__file__).resolve().parent
+LEGACY_FRONTEND_DIR = BASE_DIR / "frontend"
+UPLOAD_DIR = BASE_DIR / settings.UPLOAD_DIR
+
 # Tạo tables trong database
 ensure_database_schema(engine)
 
 # Tạo thư mục uploads
-os.makedirs(os.path.join(settings.UPLOAD_DIR, "books"), exist_ok=True)
+os.makedirs(UPLOAD_DIR / "books", exist_ok=True)
 
 
 @asynccontextmanager
@@ -42,10 +47,11 @@ app.add_middleware(
 )
 
 # Mount static files cho frontend
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
+if LEGACY_FRONTEND_DIR.exists():
+    app.mount("/static", StaticFiles(directory=LEGACY_FRONTEND_DIR), name="static")
 
 # Mount uploads directory
-app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # Include routers
 app.include_router(auth_router)
