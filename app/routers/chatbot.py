@@ -218,7 +218,7 @@ Lưu ý kỹ thuật bắt buộc:
         raw_response = await llm.generate_text(
             attempt_prompt,
             temperature=0.1,
-            max_tokens=12000,
+            max_tokens=1000,
             json_mode=True,
         )
         try:

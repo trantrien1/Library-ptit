@@ -5,6 +5,7 @@ import {
 	BookOpen,
 	Bot,
 	CalendarDays,
+	CheckCircle2,
 	Clock3,
 	FileText,
 	FlaskConical,
@@ -76,7 +77,7 @@ function LoadingSkeleton() {
 		<div className="space-y-5">
 			<div className="h-40 animate-pulse rounded-2xl bg-muted" />
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-				{Array.from({ length: 8 }).map((_, index) => (
+				{Array.from({ length: 11 }).map((_, index) => (
 					<div key={index} className="h-32 animate-pulse rounded-2xl bg-muted" />
 				))}
 			</div>
@@ -191,6 +192,8 @@ export default function UserDashboardPage() {
 		);
 	}
 
+	const returnTimingData = data.returnTimingDistribution || [];
+
 	return (
 		<div className="space-y-6">
 			<section className="overflow-hidden rounded-2xl border bg-gradient-to-br from-primary/10 via-background to-cyan-500/10 p-5 shadow-sm md:p-6">
@@ -236,6 +239,9 @@ export default function UserDashboardPage() {
 			</section>
 
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+				<KpiCard title={"Tr\u1ea3 \u0111\u00fang h\u1ea1n"} value={data.kpis.onTimeReturns} icon={CheckCircle2} tone="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40" href="/user/borrows" />
+				<KpiCard title={"Tr\u1ea3 tr\u1ec5 h\u1ea1n"} value={data.kpis.lateReturns} icon={AlertTriangle} tone="bg-red-50 text-red-600 dark:bg-red-950/40" href="/user/borrows" />
+				<KpiCard title={"\u0110ang tr\u1ec5 h\u1ea1n"} value={data.kpis.overdueCount} icon={AlertTriangle} tone="bg-rose-50 text-rose-600 dark:bg-rose-950/40" href="/user/borrows" />
 				<KpiCard title="Sách trong giỏ mượn" value={data.kpis.cartCount} icon={ShoppingBasket} tone="bg-blue-50 text-blue-600 dark:bg-blue-950/40" href="/user/wishlist" sparkline={shortTrend} />
 				<KpiCard title="Phiếu chờ duyệt" value={data.kpis.pendingBorrowRequests} icon={Clock3} tone="bg-amber-50 text-amber-600 dark:bg-amber-950/40" href="/user/borrows" sparkline={shortTrend} />
 				<KpiCard title="Sách đang mượn" value={data.kpis.activeBorrows} icon={BookOpen} tone="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40" href="/user/borrows" sparkline={shortTrend} />
@@ -255,7 +261,10 @@ export default function UserDashboardPage() {
 				</ChartCard>
 			</div>
 
-			<div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+			<div className="grid gap-5 xl:grid-cols-3">
+				<ChartCard title={"Tr\u1ea3 \u0111\u00fang h\u1ea1n / tr\u1ec5 h\u1ea1n"} subtitle={"C\u00e1c phi\u1ebfu \u0111\u00e3 tr\u1ea3 \u0111\u01b0\u1ee3c so v\u1edbi h\u1ea1n tr\u1ea3"}>
+					<DonutChart data={returnTimingData.length ? returnTimingData : [{ name: "Ch\u01b0a c\u00f3 d\u1eef li\u1ec7u", value: 1 }]} />
+				</ChartCard>
 				<ChartCard title="Mục tiêu đọc sách tháng này" subtitle={`${data.readingGoalProgress.completed}/${data.readingGoalProgress.target} sách · streak ${data.readingGoalProgress.streakDays} ngày`}>
 					<div className="flex flex-col items-center gap-5 sm:flex-row">
 						<ProgressRing value={data.readingGoalProgress.percent} label="hoàn thành" />

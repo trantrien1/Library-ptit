@@ -76,6 +76,14 @@ def _borrow_items_count(borrow: BorrowRequest) -> int:
     return sum(item.quantity or 0 for item in borrow.items or [])
 
 
+def _is_late_return(borrow: BorrowRequest) -> bool:
+    if _status_value(borrow.status) != "returned":
+        return False
+    if not borrow.due_date or not borrow.returned_at:
+        return False
+    return borrow.returned_at.date() > borrow.due_date
+
+
 def _borrow_summary(borrow: BorrowRequest) -> dict:
     first_item = borrow.items[0] if borrow.items else None
     book = first_item.book if first_item else None
@@ -122,6 +130,12 @@ def user_dashboard_overview(
     pending = len([item for item in borrows if _status_value(item.status) in {"pending", "need_edit"}])
     active = len([item for item in borrows if _status_value(item.status) == "approved"])
     returned = len([item for item in borrows if _status_value(item.status) == "returned"])
+    returned_borrows = [item for item in borrows if _status_value(item.status) == "returned"]
+    previous_returned_borrows = [item for item in previous_borrows if _status_value(item.status) == "returned"]
+    on_time_returns = len([item for item in returned_borrows if not _is_late_return(item)])
+    late_returns = len([item for item in returned_borrows if _is_late_return(item)])
+    previous_on_time_returns = len([item for item in previous_returned_borrows if not _is_late_return(item)])
+    previous_late_returns = len([item for item in previous_returned_borrows if _is_late_return(item)])
     due_soon = len([
         item for item in borrows
         if _status_value(item.status) == "approved" and item.due_date and today <= item.due_date <= due_soon_date
@@ -290,6 +304,10 @@ def user_dashboard_overview(
         {"name": "Đã trả", "value": returned},
         {"name": "Quá hạn", "value": overdue},
     ]
+    return_timing_distribution = [
+        {"name": "Tr\u1ea3 \u0111\u00fang h\u1ea1n", "value": on_time_returns},
+        {"name": "Tr\u1ea3 tr\u1ec5 h\u1ea1n", "value": late_returns},
+    ]
 
     month_goal = max(4, returned + active + 1)
     read_progress = min(100, round((returned / month_goal) * 100))
@@ -308,6 +326,8 @@ def user_dashboard_overview(
             "returnedBooks": _change(returned, len([item for item in previous_borrows if _status_value(item.status) == "returned"])),
             "dueSoonCount": _change(due_soon, max(due_soon - 1, 0)),
             "overdueCount": _change(overdue, 0),
+            "onTimeReturns": _change(on_time_returns, previous_on_time_returns),
+            "lateReturns": _change(late_returns, previous_late_returns),
             "myPosts": _change(my_posts, max(my_posts - 1, 0)),
             "joinedGroups": _change(joined_groups, max(joined_groups - 1, 0)),
             "registeredEvents": _change(registered_events, max(registered_events - 1, 0)),
@@ -323,6 +343,7 @@ def user_dashboard_overview(
         },
         "borrowTrend": _daily_series(borrows, lambda item: item.created_at, days=days),
         "statusDistribution": status_distribution,
+        "returnTimingDistribution": return_timing_distribution,
         "activityHeatmap": _daily_series(borrows + lab_bookings, lambda item: getattr(item, "created_at", None), days=35),
         "activityTimeline": timeline,
         "reminders": reminders[:8],
@@ -424,11 +445,17 @@ def admin_dashboard_overview(
     pending = len([item for item in borrows if _status_value(item.status) == "pending"])
     active = len([item for item in borrows if _status_value(item.status) == "approved"])
     returned = len([item for item in borrows if _status_value(item.status) == "returned"])
+    returned_borrows = [item for item in borrows if _status_value(item.status) == "returned"]
+    previous_returned_borrows = [item for item in previous_borrows if _status_value(item.status) == "returned"]
+    on_time_returns = len([item for item in returned_borrows if not _is_late_return(item)])
+    late_returns = len([item for item in returned_borrows if _is_late_return(item)])
+    previous_on_time_returns = len([item for item in previous_returned_borrows if not _is_late_return(item)])
+    previous_late_returns = len([item for item in previous_returned_borrows if _is_late_return(item)])
     overdue = len([
         item for item in borrows
         if _status_value(item.status) == "approved" and item.due_date and item.due_date < today
     ])
-    on_time_rate = round((returned / max(returned + overdue, 1)) * 100)
+    on_time_rate = round((on_time_returns / max(returned, 1)) * 100)
 
     event_registrations = [registration for event in events for registration in (event.registrations or [])]
     checked_in = len([item for item in event_registrations if item.status == "checked_in"])
@@ -544,6 +571,8 @@ def admin_dashboard_overview(
             "activeBorrows": _change(active, max(active - 1, 0)),
             "pendingBorrows": _change(pending, max(pending - 1, 0)),
             "overdueBorrows": _change(overdue, 0),
+            "onTimeReturns": _change(on_time_returns, previous_on_time_returns),
+            "lateReturns": _change(late_returns, previous_late_returns),
             "onTimeRate": _change(on_time_rate, max(on_time_rate - 4, 0)),
             "communityGroups": _change(len(groups), max(len(groups) - 1, 0)),
             "communityPosts": _change(len(posts), max(len(posts) - len([item for item in posts if item.created_at and item.created_at >= start]), 0)),

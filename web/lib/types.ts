@@ -513,6 +513,7 @@ export interface UserDashboardOverview {
 	readingGoalProgress: { target: number; completed: number; percent: number; streakDays: number };
 	borrowTrend: ChartPoint[];
 	statusDistribution: ChartPoint[];
+	returnTimingDistribution: ChartPoint[];
 	activityHeatmap: ChartPoint[];
 	activityTimeline: Array<{ type: string; title: string; description: string; time?: string | null; url?: string }>;
 	reminders: DashboardAlert[];

@@ -6,6 +6,7 @@ import {
 	BookOpen,
 	Bot,
 	CalendarDays,
+	CheckCircle2,
 	Clock3,
 	FileClock,
 	FileText,
@@ -70,7 +71,7 @@ function DashboardSkeleton() {
 		<div className="space-y-5">
 			<div className="h-36 animate-pulse rounded-2xl bg-muted" />
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-				{Array.from({ length: 10 }).map((_, index) => <div key={index} className="h-28 animate-pulse rounded-2xl bg-muted" />)}
+				{Array.from({ length: 12 }).map((_, index) => <div key={index} className="h-28 animate-pulse rounded-2xl bg-muted" />)}
 			</div>
 			<div className="grid gap-5 xl:grid-cols-2">
 				<div className="h-80 animate-pulse rounded-2xl bg-muted" />
@@ -237,6 +238,8 @@ export default function AdminDashboardPage() {
 			</section>
 
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+				<AdminKpiCard title={"Tr\u1ea3 \u0111\u00fang h\u1ea1n"} value={data.kpis.onTimeReturns} icon={CheckCircle2} href="/admin/borrows?status=returned" tone="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40" />
+				<AdminKpiCard title={"Tr\u1ea3 tr\u1ec5 h\u1ea1n"} value={data.kpis.lateReturns} icon={AlertTriangle} href="/admin/borrows?status=returned" tone="bg-red-50 text-red-600 dark:bg-red-950/40" />
 				<AdminKpiCard title="Tổng số sách" value={data.kpis.totalBooks} icon={BookCopy} href="/admin/books" tone="bg-blue-50 text-blue-600 dark:bg-blue-950/40" sparkline={trend} />
 				<AdminKpiCard title="Bản sách khả dụng" value={data.kpis.availableCopies} icon={Library} href="/admin/books" tone="bg-cyan-50 text-cyan-600 dark:bg-cyan-950/40" sparkline={trend} />
 				<AdminKpiCard title="Tổng độc giả" value={data.kpis.totalReaders} icon={Users} href="/admin/users" tone="bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40" />
